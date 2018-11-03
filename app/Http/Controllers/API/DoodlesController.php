@@ -99,6 +99,11 @@ class DoodlesController extends Controller
     public function like($doodle_id)
     {
         $user_id = 1; //from Auth
+
+        // check if already liked
+        $like = DoodleLike::where('doodle_id', $doodle_id)->where('user_id', $user_id)->count();
+        if($like) return response()->json(['message' => 'already liked'], 200);
+
         $created = DoodleLike::create([
             'doodle_id' => $doodle_id,
             'user_id' => $user_id

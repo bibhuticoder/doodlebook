@@ -153,6 +153,6 @@ export default class Brush{
     }
 
     clear() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);    
+        this.context.clearRect(0, 0, this.context.canvas.width, this.context.canvas.height);    
     }
 } 

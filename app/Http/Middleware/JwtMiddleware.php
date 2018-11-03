@@ -10,7 +10,8 @@ class JwtMiddleware
 {
     public function handle($request, Closure $next, $guard = null)
     {
-        $token = $request->header('Authorization');
+        $token = $request->bearerToken();
+        // dd($token);
         
         if(!$token) {
             // Unauthorized response if token not there
@@ -19,7 +20,7 @@ class JwtMiddleware
             ], 401);
         }
         try {
-            $credentials = JWT::decode($token, env('JWT_SECRET'), ['HS256']);
+            $credentials = JWT::decode($token, env('JWT_SECRET'), array('HS256'));
         } catch(ExpiredException $e) {
             return response()->json([
                 'error' => 'Provided token is expired.'

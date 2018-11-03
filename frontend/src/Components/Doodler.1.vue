@@ -37,41 +37,14 @@
       </swatches>
     </b-form>
 
-    <table>
-      <tr>
-        <td>
-          <draggable v-model="frames" class="frames-container" :options="{draggable:'.frame'}">
-            <div 
-              v-for="(frame, i) in frames" 
-              :key="i" 
-              class="frame" 
-              :class="{'frame-selected': i === currentFrame}"
-              @click="switchFrame(i)"
-            >
-              <img :src="frame">
-            </div>
-            <button @click="addFrame(false)">Add New Frame</button>
-            <button @click="playAnimation">Play</button>
-          </draggable>
-        </td>
-        <td>
-          <canvas 
-            id="canvas" 
-            height="400px" 
-            width="900px"
-            @mousedown="handleMouseDown"
-            @mouseup="handleMouseUp"
-            @mousemove="handleMouseMove"
-          />
-        </td>
-      </tr>
-    </table>
-
-
-
-
-
-
+    <canvas 
+      id="canvas" 
+      height="500px" 
+      width="900px"
+      @mousedown="handleMouseDown"
+      @mouseup="handleMouseUp"
+      @mousemove="handleMouseMove"
+    />
 
   </div>
 </template>
@@ -82,10 +55,9 @@ import Swatches from 'vue-swatches';
 import ToolButton from '@/Components/ToolButton'
 import Slider from '@/Components/Slider'
 import "vue-swatches/dist/vue-swatches.min.css"
-import draggable from 'vuedraggable'
 
 export default {
-  components: {Swatches, ToolButton, Slider, draggable},
+  components: {Swatches, ToolButton, Slider},
   props: ['image'],
   name: "Doodler",
   data(){ 
@@ -100,6 +72,7 @@ export default {
         fx: null,
         fy: null
       },
+
       brushes: [
         { type: 'pencil', icon: 'fas fa-pen-fancy' },
         { type: 'marker', icon: 'fas fa-pen-alt' },
@@ -107,11 +80,7 @@ export default {
         { type: 'spray', icon: 'fas fa-spray-can' },
         { type: 'chalk', icon: 'fas fa-pencil-alt' },
         { type: 'doubleBrush', icon: 'fas fa-pencil-ruler' },
-      ],
-      currentFrame: 0,
-      frames: [],
-      speed: 500,
-      infinite: true
+      ]
     }
   },
 
@@ -131,8 +100,6 @@ export default {
     this.ctx.strokeStyle = "black";
     this.ctx.lineWidth = this.brush.size;
     this.mousedown = false;
-
-    this.addFrame();
   },
 
   methods: {
@@ -144,7 +111,6 @@ export default {
 
     handleMouseUp(e) {
       this.mousedown = false;
-      this.updateCurrentFrame();
       this.$emit('change', this.canvas.toDataURL("image/png"))
     },
 
@@ -181,6 +147,7 @@ export default {
     },
 
     drawImage(){
+      console.log('drawn');
       if(!this.image) return ;
       let img = new Image();
       img.src = `${this.baseUrl}/storage/doodles/${this.image}`;
@@ -193,42 +160,7 @@ export default {
 
     clearBoard(event){
       this.brush.clear();
-      // event.target.style.transform = "rotate(90deg)";
-    },
-
-    addFrame(emptyFrame){
-      if(emptyFrame)this.clearBoard();
-      this.frames.push(this.canvas.toDataURL("image/png"));
-      this.currentFrame = this.frames.length-1;
-    },
-
-    updateCurrentFrame(){
-      this.frames[this.currentFrame] = this.canvas.toDataURL("image/png");
-    },
-
-    switchFrame(index){
-      this.clearBoard();
-      let image = this.frames[index];
-      this.currentFrame = index;
-
-      let img = new Image();
-      img.src = image;
-      img.onload = () => {
-        this.ctx.drawImage(img, 0, 0);
-      }
-    },
-
-    playAnimation(){
-      var self = this;
-      var play = true;
-      var count = 0;
-      var limit = (this.infinite) ? this.frames.length * 100 : this.frames.length;
-      var timer = setInterval(()=>{
-        self.switchFrame(count);
-        count++;
-        count %= self.frames.length;
-        if(count >= limit) clearInterval(timer);
-      }, this.speed);
+      event.target.style.transform = "rotate(90deg)";
     }
 
 
@@ -251,7 +183,7 @@ export default {
 
 <style scoped>
 canvas {
-  float: right;
+  float: left;
   background-color: white;
   box-shadow: 1px 1px 5px grey;
 }
@@ -280,46 +212,6 @@ select{
   cursor: pointer;
   margin: 10px;
   color: #3f51b5;
-}
-
-.frames-container{
-  padding-left: 0;
-  float: left;
-  height: 400px;
-  overflow: auto;
-  border-style: solid;
-  cursor: pointer;
-  border-color: grey;
-  border-width: 1px;
-  margin-right: 10px;
-}
-
-.frame{
-  width: 70px;
-  height: 50px;
-  margin: 10px;
-  list-style-type: none;
-  text-align: center;
-  line-height: 50px;
-  border-style: solid;
-  cursor: pointer;
-  border-color: grey;
-  border-width: 1px;
-  color: grey;
-  font-weight: bold;
-  font-size: 24px;
-  transition: all 0.2s ease;
-}
-
-.frame img{
-  width: 100%;
-  height: 100%;
-}
-
-.frame-selected{
-  /* border-color: #3f51b5; */
-  color: #3f51b5;
-  box-shadow: -1px -1px 10px #3f51b5; 
 }
 
 </style>

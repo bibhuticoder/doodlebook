@@ -2,7 +2,7 @@
   <div class="container-fluid">
     <br>
     <div class="row">
-      <div class="col col-3">
+      <!-- <div class="col col-3">
         <p class="lead">
           Create New Doodle
         </p>
@@ -40,7 +40,7 @@
         >
           Save <i class="far fa-save"></i>
         </b-btn>
-      </div>
+      </div> -->
       <div class="col col-9">
         <!-- Paint Tool Goes here -->
         <Doodler @change="handleChange" />

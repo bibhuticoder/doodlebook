@@ -1,8 +1,8 @@
 <template>
-  <div class="container center">
+  <div class="container">
     <br>
-    <h1>DoodleBook</h1>
-    <p class="lead">
+    <h1 class="center">DoodleBook</h1>
+    <p class="lead center">
       A place to draw and share sketches
     </p>
     <hr>
