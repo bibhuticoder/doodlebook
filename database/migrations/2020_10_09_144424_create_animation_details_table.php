@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateDoodlesTable extends Migration
+class CreateAnimationDetailsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,13 +13,12 @@ class CreateDoodlesTable extends Migration
      */
     public function up()
     {
-        Schema::create('doodles', function (Blueprint $table) {
+        Schema::create('animation_details', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('title');
-            $table->string('description')->nullable();
-            $table->boolean('visibility')->default(0);
-            $table->integer('forked_from')->nullable();
-            $table->integer('user_id');
+            $table->boolean('infinite')->nullable();
+            $table->int('interval')->nullable();
+            $table->string('sequence')->nullable();
+            $table->integer('doodle_id')->nullable();
             $table->timestamps();
         });
     }

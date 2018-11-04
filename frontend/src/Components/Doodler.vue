@@ -41,23 +41,6 @@
       <tr>
         <td>
 
-          <!-- Controls -->
-          <div class="frames-control">
-            <b-button-group>
-              <b-button size="sm" @click="addFrame(true)">
-                <i class="fas fa-plus"></i>
-              </b-button>
-              <b-button size="sm" @click="addFrame(false)">
-                <i class="fas fa-plus-square"></i>
-              </b-button>
-              <b-button size="sm" @click="(timer === null) ? playAnimation() : stopAnimation()">
-                <i v-if="timer === null" class="fas fa-play-circle"></i>
-                <i v-else class="fas fa-stop-circle"></i>
-              </b-button>
-            </b-button-group>
-            <b-form-input size="sm" type="text" placeholder="Apeed" v-model="speed"></b-form-input>
-          </div>
-
           <draggable v-model="frames" class="frames-container" :options="{draggable:'.frame'}">
             <!-- Frames -->
             <div 
@@ -69,9 +52,22 @@
             >
               <img :src="frame">
             </div>
-
-
           </draggable>
+
+          <!-- Controls -->
+          <div class="frames-control">
+            <button size="sm" @click="addFrame(true)">
+              <i class="fas fa-plus"></i>
+            </button>
+            <button size="sm" @click="addFrame(false)">
+              <i class="fas fa-plus-square"></i>
+            </button>
+            <button size="sm" @click="(timer === null) ? playAnimation() : stopAnimation()">
+              <i v-if="timer === null" class="fas fa-play-circle"></i>
+              <i v-else class="fas fa-stop-circle"></i>
+            </button>
+            <input type="text" placeholder="Speed" v-model="speed" />
+          </div>
         </td>
         <td>
           <canvas 
@@ -251,9 +247,6 @@ export default {
       this.timer = null;
     }
 
-
-
-
   },
   computed: {
     baseUrl() {
@@ -271,7 +264,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 canvas {
   float: right;
   background-color: white;
@@ -310,14 +303,11 @@ select{
   height: 400px;
   overflow: auto;
   cursor: pointer;
-    /* border-style: solid; */
-  /* border-color: grey;
-  border-width: 1px; */
   margin-right: 10px;
 }
 
 .frames-control{
-  width: 70px;
+  width: 80px;
 }
 
 .frame{
@@ -343,9 +333,43 @@ select{
 }
 
 .frame-selected{
-  /* border-color: #3f51b5; */
   color: #3f51b5;
   box-shadow: -1px -1px 10px #3f51b5; 
+}
+
+.frames-control{ 
+  
+  button{
+    float: left;
+    cursor: pointer;
+    outline: none;
+    border-style: solid;
+    border-width: 1px;
+    border-color: #3f51b5;
+    background-color: white;
+    font-size: 12px;
+    color: #3f51b5;
+    margin-right: 1px;
+    transition: all 0.2s ease;
+  }
+
+  button:hover{
+    background-color: #3f51b5;
+    color: white;
+  }
+
+  input{
+    margin-top: 1px;
+    outline: none;
+    border-color: #3f51b5;
+    border-width: 1px;
+    width: 77px;
+    color: #3f51b5;
+    font-size: 12px;
+    text-align: center;
+  }
+
+
 }
 
 </style>

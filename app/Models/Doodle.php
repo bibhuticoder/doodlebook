@@ -19,4 +19,12 @@ class Doodle extends Model
         return $this->hasmany('App\Models\DoodleLike', 'doodle_id');
     }
 
+    public function frames(){
+        return $this->hasmany('App\Models\Frame', 'doodle_id');
+    }
+
+    public function details(){
+        return $this->hasOne('App\Models\AnimationDetail', 'doodle_id');
+    }
+
 }

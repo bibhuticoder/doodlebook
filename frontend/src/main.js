@@ -10,7 +10,9 @@ import 'bootstrap-vue/dist/bootstrap-vue.css'
 import wysiwyg from "vue-wysiwyg";
 import "vue-wysiwyg/dist/vueWysiwyg.css";
 import Sortable from 'vue-sortable'
+import Vuebar from 'vuebar';
 
+Vue.use(Vuebar);
 Vue.use(Sortable)
 Vue.use(wysiwyg, {hideModules: { "code": true, "bold": true, "italic": true, "underline": true, "separator": true, "image": true }});
 Vue.config.productionTip = false

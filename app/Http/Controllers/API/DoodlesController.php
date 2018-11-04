@@ -51,6 +51,10 @@ class DoodlesController extends Controller
             'image' => $fileNameToStore,
             'user_id' => 1 //get from auth
         ]);
+        
+        $details = new AnimationDetail;
+        $details->save();
+
         return ($created)
             ? response()->json($created, 201)
             : response()->json(['message' => 'failed'], 400);
