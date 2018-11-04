@@ -40,7 +40,26 @@
     <table>
       <tr>
         <td>
+
+          <!-- Controls -->
+          <div class="frames-control">
+            <b-button-group>
+              <b-button size="sm" @click="addFrame(true)">
+                <i class="fas fa-plus"></i>
+              </b-button>
+              <b-button size="sm" @click="addFrame(false)">
+                <i class="fas fa-plus-square"></i>
+              </b-button>
+              <b-button size="sm" @click="(timer === null) ? playAnimation() : stopAnimation()">
+                <i v-if="timer === null" class="fas fa-play-circle"></i>
+                <i v-else class="fas fa-stop-circle"></i>
+              </b-button>
+            </b-button-group>
+            <b-form-input size="sm" type="text" placeholder="Apeed" v-model="speed"></b-form-input>
+          </div>
+
           <draggable v-model="frames" class="frames-container" :options="{draggable:'.frame'}">
+            <!-- Frames -->
             <div 
               v-for="(frame, i) in frames" 
               :key="i" 
@@ -50,8 +69,8 @@
             >
               <img :src="frame">
             </div>
-            <button @click="addFrame(false)">Add New Frame</button>
-            <button @click="playAnimation">Play</button>
+
+
           </draggable>
         </td>
         <td>
@@ -66,12 +85,6 @@
         </td>
       </tr>
     </table>
-
-
-
-
-
-
 
   </div>
 </template>
@@ -111,7 +124,8 @@ export default {
       currentFrame: 0,
       frames: [],
       speed: 500,
-      infinite: true
+      infinite: true,
+      timer: null
     }
   },
 
@@ -219,17 +233,25 @@ export default {
     },
 
     playAnimation(){
+      console.log("sadas");
       var self = this;
       var play = true;
       var count = 0;
       var limit = (this.infinite) ? this.frames.length * 100 : this.frames.length;
-      var timer = setInterval(()=>{
+      this.timer = setInterval(()=>{
         self.switchFrame(count);
         count++;
         count %= self.frames.length;
-        if(count >= limit) clearInterval(timer);
+        if(count >= limit) clearInterval(self.timer);
       }, this.speed);
+    },
+
+    stopAnimation(){
+      clearInterval(this.timer);
+      this.timer = null;
     }
+
+
 
 
   },
@@ -287,11 +309,15 @@ select{
   float: left;
   height: 400px;
   overflow: auto;
-  border-style: solid;
   cursor: pointer;
-  border-color: grey;
-  border-width: 1px;
+    /* border-style: solid; */
+  /* border-color: grey;
+  border-width: 1px; */
   margin-right: 10px;
+}
+
+.frames-control{
+  width: 70px;
 }
 
 .frame{
