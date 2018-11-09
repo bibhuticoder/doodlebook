@@ -1,46 +1,45 @@
 <template>
-<!-- <nav class="navbar navbar-dark bg-dark">
-  <a class="navbar-brand" href="#">DoodleBook</a>
+  <b-navbar toggleable="md" type="dark" variant="dark" fixed="top" class="_navbar">
 
-  <div v-if="loggedIn">
-    <router-link to="/new" class="btn btn-primary btn-sm">Create</router-link>
-  </div>
-  <div v-else>
-    <router-link to="/login" class="btn btn-success btn-sm">Login</router-link>
-  </div>
+    <b-navbar-toggle target="nav_collapse"></b-navbar-toggle>
 
-</nav> -->
+    <b-navbar-brand href="#/">
+      <i class="fas fa-book"></i> DoodleBook
+    </b-navbar-brand>
 
-<b-navbar toggleable="md" type="dark" variant="dark">
+    <b-collapse is-nav id="nav_collapse">
 
-  <b-navbar-toggle target="nav_collapse"></b-navbar-toggle>
+      <!-- Right aligned nav items -->
+      <b-navbar-nav class="ml-auto">
+        <b-nav-form>
+          <div v-if="loggedIn">
+            <router-link to="/new" class="btn btn-primary btn-sm">
+              <i class="fas fa-plus"></i> Create New Doodle
+            </router-link>
 
-  <b-navbar-brand href="#/">DoodleBook</b-navbar-brand>
-
-  <b-collapse is-nav id="nav_collapse">
-
-    <!-- Right aligned nav items -->
-    <b-navbar-nav class="ml-auto">
-      <b-nav-form>
-        <div v-if="loggedIn">
-          <router-link to="/new" class="btn btn-primary btn-sm">
-            <i class="fas fa-plus"></i> Create New
-          </router-link>
-
-            <b-dropdown id="ddown1" text="User" class="btn-default">
-              <b-dropdown-item>Profile</b-dropdown-item>
-              <b-dropdown-item @click="logout">Logout</b-dropdown-item>
+            <b-dropdown variant="link" size="lg">
+              <template slot="button-content">
+                <img class="dropdown-avatar" :src="`${baseUrl}/storage/profile_pics/${user.profile_pic}`" alt="">
+              </template>
+              <b-dropdown-item @click="$router.push({name: 'Dashboard'})">
+                <i class="fas fa-book"></i> My Book
+              </b-dropdown-item>
+              <b-dropdown-item @click="$router.push({name: 'ProfileEdit'})">
+                <i class="fas fa-user-circle"></i> Profile
+              </b-dropdown-item>
+              <b-dropdown-item @click="logout">
+                <i class="fas fa-sign-out-alt"></i> Logout
+              </b-dropdown-item>
             </b-dropdown>
-        </div>
-        <div v-else>
-          <router-link to="/login" class="btn btn-success btn-sm">Login</router-link>
-        </div>
-      </b-nav-form>
-    </b-navbar-nav>
-  </b-collapse>
-</b-navbar>
 
-
+          </div>
+          <div v-else>
+            <router-link to="/login" class="btn btn-success btn-sm">Login</router-link>
+          </div>
+        </b-nav-form>
+      </b-navbar-nav>
+    </b-collapse>
+  </b-navbar>
 </template>
 
 <script>
@@ -51,7 +50,9 @@ export default {
   methods: {
     logout(){
       this.$store.commit('setToken', null);
+      this.$store.commit('setUser', null);
       localStorage.removeItem('_token');
+      this.$router.push({name: 'Login'});
     }
   },
   computed: {
@@ -60,17 +61,28 @@ export default {
     },
     user(){
       return this.$store.getters.user;
+    },
+    baseUrl() {
+      return this.$store.getters.baseUrl;
     }
   }
+
 };
 </script>
 
 <style scoped>
-.navbar {
+._navbar {
   border-radius: 0px !important;
-  height: 50px;
-  z-index: 10;
+  z-index: 500;
   background-color: #24292e;
-  /* box-shadow: 1px 1px 2px black; */
+  margin-bottom: 10px;
+  box-shadow: -1px 1px 2px gray;
+  height: 50px;
+}
+
+.dropdown-avatar{
+  height: 30px;
+  width: 30px;
+  border-radius: 100%;
 }
 </style>

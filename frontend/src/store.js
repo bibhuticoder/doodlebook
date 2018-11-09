@@ -20,7 +20,7 @@ export const store = new Vuex.Store({
     },
 
     loggedIn(state){
-      return (state.token !== null);
+      return (state.user !== null);
     }
 
   },
@@ -39,6 +39,7 @@ export const store = new Vuex.Store({
       axios.get(`${context.getters.baseUrl}/api/auth/me`)
         .then(response => {
           context.commit('setUser', response.data);
+          if(payload) payload.callback(response.data);
         })
         .catch(e => {
           console.log(e);

@@ -15,7 +15,8 @@ class CreateFramesTable extends Migration
     {
         Schema::create('frames', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('data')->nullable();
+            $table->string('image')->nullable();
+            $table->integer('duration')->default(100);
             $table->integer('doodle_id');
             $table->timestamps();
         });
@@ -28,6 +29,6 @@ class CreateFramesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('doodles');
+        Schema::dropIfExists('frames');
     }
 }

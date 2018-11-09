@@ -8,7 +8,7 @@ class Frame extends Model
 {
     protected $table = "frames";
     protected $fillable = [
-        'data', 'doodle_id'
+        'image', 'doodle_id', 'duration'
     ];
 
 }

@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Firebase\JWT\ExpiredException;
 use Illuminate\Support\Facades\Hash;
 use App\Http\Controllers\Controller as BaseController;
+use Avatar;
 
 class AuthController extends BaseController 
 {
@@ -21,7 +22,7 @@ class AuthController extends BaseController
             'iss' => "doodlebook-jwt", // Issuer of the token
             'sub' => $user->id, // Subject of the token
             'iat' => time(), // Time when JWT was issued. 
-            'exp' => time() + 60*60 // Expiration time
+            'exp' => time() + 60*60*60 // Expiration time
         ];
         return JWT::encode($payload, env('JWT_SECRET'));
     }
@@ -37,7 +38,7 @@ class AuthController extends BaseController
         $user = User::where('email', $this->request->input('email'))->first();
         if (!$user) {
             return response()->json([
-                'error' => 'Email does not exist.'
+                'message' => 'Email does not exist.'
             ], 400);
         }
 
@@ -50,11 +51,11 @@ class AuthController extends BaseController
 
         // Bad Request response
         return response()->json([
-            'error' => 'Email or password is wrong.'
+            'message' => 'Email or password is wrong.'
         ], 400);
     }
 
-    public function register() {
+    public function register(Request $request) {
         $this->validate($this->request, [
             'username'     => 'required',
             'email'     => 'required|email|unique:users',
@@ -64,13 +65,15 @@ class AuthController extends BaseController
         // hash the password
         $passwordHash = Hash::make($this->request->input('password'));
         
-        // return $this->request;
-
+        //create avatar
+        $profile_pic_name = $request->input('username').'_'.time().'.png';
         $user = User::create([
             'username' => $this->request->input('username'),
             'email' => $this->request->input('email'),
-            'password' => $passwordHash
+            'password' => $passwordHash,
+            'profile_pic' => $profile_pic_name
         ]);
+        Avatar::create($request->input('username'))->save(public_path('\storage\profile_pics\\' . $profile_pic_name, 100));
         
         return response()->json([
             'token' => $this->jwt($user)
@@ -79,6 +82,18 @@ class AuthController extends BaseController
 
     public function me() {
         return response()->json($this->request->auth);
+    }
+
+    public function update(Request $request){
+        if($request->image){
+            \Image::make($request->image)->save(public_path('\storage\profile_pics\\' . $request->auth->profile_pic));
+        }
+        $updated = $request->auth->update([
+            'email' => $request->input('email'),
+            'username' => $request->input('username'),
+            'bio' => $request->input('bio'),
+        ]);
+        return response()->json(['user' => $request->auth]);
     }
 
 }

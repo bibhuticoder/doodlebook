@@ -25,7 +25,6 @@ class DoodleRequest extends FormRequest
     {
         return [
             'title' => 'required',
-            'image' => 'required',
             'visibility' => 'required'
         ];
     }

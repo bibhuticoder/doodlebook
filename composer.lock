@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "f02bdeaa53ea1d59e3c88aba3516c301",
+    "content-hash": "7ec2383663a8962398b83bf273b61166",
     "packages": [
         {
             "name": "asm89/stack-cors",
@@ -119,6 +119,62 @@
                 "laravel"
             ],
             "time": "2018-09-06T13:20:53+00:00"
+        },
+        {
+            "name": "danielstjules/stringy",
+            "version": "3.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/danielstjules/Stringy.git",
+                "reference": "df24ab62d2d8213bbbe88cc36fc35a4503b4bd7e"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/danielstjules/Stringy/zipball/df24ab62d2d8213bbbe88cc36fc35a4503b4bd7e",
+                "reference": "df24ab62d2d8213bbbe88cc36fc35a4503b4bd7e",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.4.0",
+                "symfony/polyfill-mbstring": "~1.1"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "~4.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Stringy\\": "src/"
+                },
+                "files": [
+                    "src/Create.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Daniel St. Jules",
+                    "email": "danielst.jules@gmail.com",
+                    "homepage": "http://www.danielstjules.com"
+                }
+            ],
+            "description": "A string manipulation library with multibyte support",
+            "homepage": "https://github.com/danielstjules/Stringy",
+            "keywords": [
+                "UTF",
+                "helpers",
+                "manipulation",
+                "methods",
+                "multibyte",
+                "string",
+                "utf-8",
+                "utility",
+                "utils"
+            ],
+            "time": "2017-06-12T01:10:27+00:00"
         },
         {
             "name": "dnoegel/php-xdg-base-dir",
@@ -951,6 +1007,71 @@
             "time": "2018-05-17T13:42:07+00:00"
         },
         {
+            "name": "laravolt/avatar",
+            "version": "2.0.5",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/laravolt/avatar.git",
+                "reference": "28eecefb0dd3ed6c84de44d4637bbd1346d4d63e"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/laravolt/avatar/zipball/28eecefb0dd3ed6c84de44d4637bbd1346d4d63e",
+                "reference": "28eecefb0dd3ed6c84de44d4637bbd1346d4d63e",
+                "shasum": ""
+            },
+            "require": {
+                "danielstjules/stringy": "~3.1",
+                "illuminate/cache": "~5.2",
+                "illuminate/support": "~5.2",
+                "intervention/image": "^2.1",
+                "php": ">=7.0"
+            },
+            "require-dev": {
+                "mockery/mockery": "^0.9.1",
+                "phpunit/phpunit": "~6.0"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "2.0-dev"
+                },
+                "laravel": {
+                    "providers": [
+                        "Laravolt\\Avatar\\ServiceProvider"
+                    ],
+                    "aliases": {
+                        "Avatar": "Laravolt\\Avatar\\Facade"
+                    }
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Laravolt\\Avatar\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Bayu Hendra Winata",
+                    "email": "uyab.exe@gmail.com",
+                    "homepage": "http://id-laravel.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Turn name, email, and any other string into beautiful, initial-based avatar.",
+            "homepage": "https://github.com/laravolt/avatar",
+            "keywords": [
+                "avatar",
+                "laravel",
+                "laravolt"
+            ],
+            "time": "2018-11-08T08:36:25+00:00"
+        },
+        {
             "name": "league/flysystem",
             "version": "1.0.46",
             "source": {
@@ -1260,6 +1381,59 @@
                 "random"
             ],
             "time": "2018-07-02T15:55:56+00:00"
+        },
+        {
+            "name": "pomirleanu/gif-create",
+            "version": "v1.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/pomirleanu/gif-create.git",
+                "reference": "84a840fb53285b8531d2d6e020434f6c501bf5bc"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/pomirleanu/gif-create/zipball/84a840fb53285b8531d2d6e020434f6c501bf5bc",
+                "reference": "84a840fb53285b8531d2d6e020434f6c501bf5bc",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/support": "~5.1",
+                "php": "~5.6|~7.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "~4.0||~5.0",
+                "squizlabs/php_codesniffer": "^2.3"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.0-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Pomirleanu\\GifCreate\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Pomirleanu Florentin Cristinel",
+                    "email": "pomirleanu.florentin@gmail.com",
+                    "homepage": "http://printreblocuri.ro",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Easy way to create gif animations from png images.",
+            "homepage": "https://github.com/pomirleanu/gif-create",
+            "keywords": [
+                "GifCreate",
+                "pomirleanu"
+            ],
+            "time": "2016-10-21T18:37:41+00:00"
         },
         {
             "name": "psr/container",

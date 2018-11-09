@@ -17,6 +17,7 @@ class CreateDoodlesTable extends Migration
             $table->increments('id');
             $table->string('title');
             $table->string('description')->nullable();
+            $table->string('image')->nullable();
             $table->boolean('visibility')->default(0);
             $table->integer('forked_from')->nullable();
             $table->integer('user_id');

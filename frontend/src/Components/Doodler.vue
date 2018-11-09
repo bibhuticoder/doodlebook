@@ -1,82 +1,58 @@
 <template>
   <div>
-    <b-form inline>
-      <!-- Brushes -->
-      <ToolButton 
-        :icon="b.icon"
-        :selected="(b.type === brush.type)"
-        v-for="(b, i) in brushes" 
-        :key="i"
-        @clicked="changeBrush(b.type)" />
 
-        <div class="seperator"></div>
-
-        <select @change="changeBrushSize">
-          <option value="1">1</option>
-          <option value="3">2</option>
-          <option value="5">3</option>
-          <option value="7">4</option>
-          <option value="10">5</option>
-        </select>
-
-        <i class="fas fa-sync-alt btn-clear" @click="clearBoard"></i>
-        
-        <div class="seperator"></div>
-
-      <!-- Color Picker -->
-      <swatches
-        v-if="canvas"
-        v-model="brush.color" 
-        @input="changeColor"
-        colors="text-advanced" 
-        shapes="circles"
-        swatch-size="20"
-        :show-border="true"
-        :trigger-style="{borderStyle: 'solid', borderWidth: '3px', borderColor: 'whitesmoke', height: '35px', width: '35px', cursor: 'pointer', boxShadow: '1px 1px 2px black'}"
-        >
-      </swatches>
-    </b-form>
-
+    <DoodlerToolbar
+      :default-duration="(frames[currentFrame]) ? (frames[currentFrame].duration) : 0"
+      @sizeChanged="(size)=> this.size = size"
+      @colorChanged="(color)=> this.color = color"
+      @brushChanged="(brush)=> this.brush = brush"
+      @cleared="clearBoard"
+      @frameAdded="addFrame(true)"
+      @frameCloned="addFrame(false)"
+      @frameDeleted="deleteCurrentFrame"
+      @animationPlayed="playAnimation"
+      @animationStopped="stopAnimation"
+      @durationChanged="handleDurationChange"
+      @saved="updateCurrentFrame"
+    />
+      
     <table>
       <tr>
         <td>
-
-          <draggable v-model="frames" class="frames-container" :options="{draggable:'.frame'}">
-            <!-- Frames -->
-            <div 
-              v-for="(frame, i) in frames" 
-              :key="i" 
-              class="frame" 
-              :class="{'frame-selected': i === currentFrame}"
-              @click="switchFrame(i)"
-            >
-              <img :src="frame">
-            </div>
+          <draggable
+            v-if="frames.length > 0"
+            v-model="frames" 
+            class="frames-container" 
+            :options="{draggable:'.frame'}"
+            @end="updateAnimationDetail">
+              <!-- Frames -->
+              <Frame 
+                v-for="(frame, i) in frames" 
+                :key="i"
+                :frame="frame" 
+                :selected="i === currentFrame"
+                :color="color"
+                @clicked="switchFrame(i)" />
           </draggable>
 
-          <!-- Controls -->
-          <div class="frames-control">
-            <button size="sm" @click="addFrame(true)">
-              <i class="fas fa-plus"></i>
-            </button>
-            <button size="sm" @click="addFrame(false)">
-              <i class="fas fa-plus-square"></i>
-            </button>
-            <button size="sm" @click="(timer === null) ? playAnimation() : stopAnimation()">
-              <i v-if="timer === null" class="fas fa-play-circle"></i>
-              <i v-else class="fas fa-stop-circle"></i>
-            </button>
-            <input type="text" placeholder="Speed" v-model="speed" />
+          <div v-else class="msg-no-frame" @click="addFrame(true)">
+            <i class="fas fa-plus"></i>
           </div>
+
+          <div v-if="addingFrame" class="adding-frame" :style="'color: ' + color">
+            <i class="fas fa-sync fa-spin"></i>
+          </div>
+
         </td>
         <td>
-          <canvas 
-            id="canvas" 
+          <Canvas
+            ref="canvas"
             height="400px" 
             width="900px"
-            @mousedown="handleMouseDown"
-            @mouseup="handleMouseUp"
-            @mousemove="handleMouseMove"
+            :brushType="brush"
+            :size="size"
+            :color="color"
+            @change="handleCanvasChange"
           />
         </td>
       </tr>
@@ -86,166 +62,170 @@
 </template>
 
 <script>
-import Brush from './Brush.js';
-import Swatches from 'vue-swatches';
-import ToolButton from '@/Components/ToolButton'
-import Slider from '@/Components/Slider'
-import "vue-swatches/dist/vue-swatches.min.css"
-import draggable from 'vuedraggable'
+import Canvas from '@/Components/Canvas';
+import DoodlerToolbar from '@/Components/DoodlerToolbar';
+import Frame from '@/Components/Frame';
+import draggable from 'vuedraggable';
+import axios from "axios";
 
 export default {
-  components: {Swatches, ToolButton, Slider, draggable},
-  props: ['image'],
+  components: {draggable, Canvas, DoodlerToolbar, Frame},
+  props: ['doodle-id', 'initFrames'],
   name: "Doodler",
   data(){ 
     return{
-      canvas: null,
-      ctx: null,
-      brush: null,
-      mousedown: null,
-      pos: {
-        ix: null,
-        iy: null,
-        fx: null,
-        fy: null
-      },
-      brushes: [
-        { type: 'pencil', icon: 'fas fa-pen-fancy' },
-        { type: 'marker', icon: 'fas fa-pen-alt' },
-        { type: 'eraser', icon: 'fas fa-eraser' },
-        { type: 'spray', icon: 'fas fa-spray-can' },
-        { type: 'chalk', icon: 'fas fa-pencil-alt' },
-        { type: 'doubleBrush', icon: 'fas fa-pencil-ruler' },
-      ],
+      brush: 'pencil',
+      size: 1,
+      color: 'black',
+
       currentFrame: 0,
       frames: [],
-      speed: 500,
-      infinite: true,
+      addingFrame: false,
       timer: null
     }
   },
 
   created(){
-    this.brush = new Brush(2, "black", 10, 2);
+
   },
 
   mounted() {
-    this.canvas = document.getElementById("canvas");
-    this.ctx = this.canvas.getContext("2d");
-    this.drawImage();
-    this.brush.setContext(this.ctx);
-    this.brush.changeBrush("pencil");
-    
-    this.ctx.lineJoin = 'round';
-    this.ctx.lineCap = 'round';
-    this.ctx.strokeStyle = "black";
-    this.ctx.lineWidth = this.brush.size;
-    this.mousedown = false;
 
-    this.addFrame();
+    this.frames = this.initFrames.map((frame, i) => {
+      return({
+        ...frame,
+        sn: i,
+        data: `${this.baseUrl}/getImage?type=frame&filename=${frame.image}`,
+        status: 2,
+      });
+    });
+
+    for(var i=0; i<frames.length; i++){
+      var self = this;
+      this.urlToData(this.frames[i].data, function(data){
+        self.frames[i].data = data;
+      })
+    }
+  
   },
 
   methods: {
-    handleMouseDown(e) {
-      this.mousedown = true;
-      this.pos.ix = this.getMousePos(this.canvas, e).x;
-      this.pos.iy = this.getMousePos(this.canvas, e).y;
-    },
 
-    handleMouseUp(e) {
-      this.mousedown = false;
-      this.updateCurrentFrame();
-      this.$emit('change', this.canvas.toDataURL("image/png"))
-    },
-
-    handleMouseMove(e) {
-      if (this.mousedown) {
-        this.pos.fx = this.getMousePos(canvas, e).x;
-        this.pos.fy = this.getMousePos(canvas, e).y;
-
-        this.brush.draw(this.pos.ix, this.pos.iy, this.pos.fx, this.pos.fy);
-
-        this.pos.ix = this.pos.fx;
-        this.pos.iy = this.pos.fy;
-      }
-    },
-
-    getMousePos(canvas, evt) {
-      var rect = canvas.getBoundingClientRect();
-      return {
-        x: evt.clientX - rect.left,
-        y: evt.clientY - rect.top
-      };
-    },
-
-    changeColor(color){
-      this.brush.changeColor(color);
-    },
-
-    changeBrushSize(event){
-      this.brush.changeSize(event.target.value);
-    },
-
-    changeBrush(type){
-      this.brush.changeBrush(type);
-    },
-
-    drawImage(){
-      if(!this.image) return ;
-      let img = new Image();
-      img.src = `${this.baseUrl}/storage/doodles/${this.image}`;
-      img['crossOrigin'] = "Anonymous";
+    urlToData(url, callback){
+      var c = document.createElement('canvas');
+      var ctx = c.getContext('2d');
+      let img = new Image;
+      img.crossOrigin  = "Anonymous";
       img.onload = () => {
-        this.ctx.drawImage(img, 0, 0);
-      }
-      
+        c.height = img.height;
+        c.width = img.width;
+        ctx.drawImage(img, 0, 0);
+        callback(c.toDataURL("image/png"));
+      };
+      img.src = url;
+    },
+    
+    handleCanvasChange(data) {
+      this.updateCurrentFrame(data);
     },
 
-    clearBoard(event){
-      this.brush.clear();
-      // event.target.style.transform = "rotate(90deg)";
+    clearBoard(){
+      this.$refs.canvas.clear();
+    },
+
+    handleDurationChange(duration){
+      this.frames[this.currentFrame].duration = duration;
+      this.frames[this.currentFrame].status = 0;
     },
 
     addFrame(emptyFrame){
+      if(this.addingFrame) return;
       if(emptyFrame)this.clearBoard();
-      this.frames.push(this.canvas.toDataURL("image/png"));
-      this.currentFrame = this.frames.length-1;
+      let frameData = this.$refs.canvas.getData();
+      var self = this;
+      self.addingFrame = true;
+      axios.post(`${this.baseUrl}/api/frame`, {
+        doodle_id: self.doodleId,
+        image: frameData
+      })
+      .then(response => {
+        self.frames.push({id: response.data, sn: self.frames.length, data: frameData, status: 2, duration: 100});
+        self.currentFrame = self.frames.length-1;
+        self.addingFrame = false;
+      })
+      .catch(e => {
+        console.log(e);
+      });
     },
 
-    updateCurrentFrame(){
-      this.frames[this.currentFrame] = this.canvas.toDataURL("image/png");
+    updateCurrentFrame(data){
+      var self = this;
+      self.frames[self.currentFrame].status = 1;
+      if(data) self.frames[self.currentFrame].data = data;
+      axios.put(`${this.baseUrl}/api/frame/${self.frames[self.currentFrame].id}`, {
+        image: self.frames[self.currentFrame].data,
+        duration: self.frames[self.currentFrame].duration
+      })
+      .then(response => {
+        self.frames[self.currentFrame].status = 2;
+        self.$emit('statusChange', 0);
+      })
+      .catch(e => {
+        console.log(e);
+      });
+    },
+
+    deleteCurrentFrame(){
+      var self = this;
+      self.frames[self.currentFrame].status = 1;
+      axios.delete(`${this.baseUrl}/api/frame/${self.frames[self.currentFrame].id}`)
+      .then(response => {
+        self.frames.splice(self.currentFrame, 2);
+      })
+      .catch(e => {
+        console.log(e);
+      });
     },
 
     switchFrame(index){
       this.clearBoard();
-      let image = this.frames[index];
+      let image = this.frames[index].data;
       this.currentFrame = index;
-
-      let img = new Image();
-      img.src = image;
-      img.onload = () => {
-        this.ctx.drawImage(img, 0, 0);
-      }
+      this.$refs.canvas.drawImage(image);
     },
 
     playAnimation(){
-      console.log("sadas");
       var self = this;
-      var play = true;
       var count = 0;
-      var limit = (this.infinite) ? this.frames.length * 100 : this.frames.length;
-      this.timer = setInterval(()=>{
-        self.switchFrame(count);
-        count++;
-        count %= self.frames.length;
-        if(count >= limit) clearInterval(self.timer);
-      }, this.speed);
+      var limit = this.frames.length * 100;
+
+      while(limit !== 0){
+        this.timer = setTimeout(()=>{
+          self.switchFrame(count);
+          count++;
+          count %= self.frames.length;
+        }, self.frames[self.currentFrame].duration * 10);
+        limit--;
+      }
+
+      // this.timer = setInterval(()=>{
+      //   self.switchFrame(count);
+      //   count++;
+      //   count %= self.frames.length;
+      //   if(count >= limit) clearInterval(self.timer);
+      // }, this.animation_detail.interval);
+
     },
 
     stopAnimation(){
-      clearInterval(this.timer);
+      clearTimeout(this.timer);
       this.timer = null;
-    }
+    },
+
+    updateAnimationDetail(){
+      this.animation_detail.sequence = this.frames.map(frame => frame.sn).join(',');
+      this.$emit('animationDetailChange', this.animation_detail);
+    },
 
   },
   computed: {
@@ -265,111 +245,38 @@ export default {
 </script>
 
 <style scoped lang="scss">
-canvas {
-  float: right;
-  background-color: white;
-  box-shadow: 1px 1px 5px grey;
-}
-select{
-  margin: 2px;
-  padding: 2px;
-  cursor: pointer;
-  outline: none;
-  background-color: white;
-  color: #3f51b5;
-  border-style: solid;
-  border-color: #3f51b5;
-  border-width: 1px;
-  border-radius: 3px;
-}
-
-.seperator{
-  height: 30px;
-  width: 1px;
-  margin-left: 20px;
-  margin-right: 20px;
-  background-color: #3f51b5;
-}
-
-.btn-clear{
-  cursor: pointer;
-  margin: 10px;
-  color: #3f51b5;
-}
 
 .frames-container{
-  padding-left: 0;
+  padding-left: 10px;
   float: left;
   height: 400px;
   overflow: auto;
   cursor: pointer;
-  margin-right: 10px;
+
+  div.adding-frame{
+    text-align: center;
+  }
+
 }
 
 .frames-control{
   width: 80px;
+  margin-right: 10px;
 }
 
-.frame{
+.msg-no-frame{
+  padding: 10px;
+  margin: 10px;
   width: 70px;
   height: 50px;
-  margin: 10px;
-  list-style-type: none;
+  border-style: dotted;
+  border-width: 2px;
+  border-color: gray;
+  color: gray;
   text-align: center;
-  line-height: 50px;
-  border-style: solid;
   cursor: pointer;
-  border-color: grey;
-  border-width: 1px;
-  color: grey;
-  font-weight: bold;
-  font-size: 24px;
-  transition: all 0.2s ease;
 }
 
-.frame img{
-  width: 100%;
-  height: 100%;
-}
 
-.frame-selected{
-  color: #3f51b5;
-  box-shadow: -1px -1px 10px #3f51b5; 
-}
-
-.frames-control{ 
-  
-  button{
-    float: left;
-    cursor: pointer;
-    outline: none;
-    border-style: solid;
-    border-width: 1px;
-    border-color: #3f51b5;
-    background-color: white;
-    font-size: 12px;
-    color: #3f51b5;
-    margin-right: 1px;
-    transition: all 0.2s ease;
-  }
-
-  button:hover{
-    background-color: #3f51b5;
-    color: white;
-  }
-
-  input{
-    margin-top: 1px;
-    outline: none;
-    border-color: #3f51b5;
-    border-width: 1px;
-    width: 77px;
-    color: #3f51b5;
-    font-size: 12px;
-    text-align: center;
-  }
-
-
-}
 
 </style>

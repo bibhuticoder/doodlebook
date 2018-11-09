@@ -23,8 +23,12 @@ class Doodle extends Model
         return $this->hasmany('App\Models\Frame', 'doodle_id');
     }
 
-    public function details(){
+    public function animationDetail(){
         return $this->hasOne('App\Models\AnimationDetail', 'doodle_id');
+    }
+
+    public function user(){
+        return $this->belongsTo('App\User', 'user_id');
     }
 
 }

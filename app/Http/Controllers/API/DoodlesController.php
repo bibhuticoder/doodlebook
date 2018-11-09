@@ -5,10 +5,13 @@ namespace App\Http\Controllers\API;
 use Illuminate\Http\Request;
 use App\Models\Doodle;
 use App\Models\DoodleLike;
+use App\Models\AnimationDetail;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Doodle\DoodleResource;
 use App\Http\Resources\Doodle\DoodleCollectionResource;
 use App\Http\Requests\DoodleRequest;
+use Illuminate\Support\Facades\DB;
+use Pomirleanu\GifCreate\GifCreate;
 
 class DoodlesController extends Controller
 {
@@ -30,64 +33,93 @@ class DoodlesController extends Controller
     // show specific doodle
     public function show($id)
     {
-        $doodle = Doodle::with('comments', 'comments.replies')->findOrFail($id);
-        return response()->json(new DoodleResource($doodle), 200);
+        $doodle = Doodle::findOrFail($id);
+        return response()->json(($doodle), 200);
+    }
+
+    // show specific doodle with frames
+    public function showWithFrames($id)
+    {
+        $doodle = Doodle::with('frames', 'animationDetail')->findOrFail($id);
+        return response()->json($doodle, 200);
     }
 
     // store Doodle in Database
-    public function store(DoodleRequest $request)
+    public function store(Request $request)
     {
-        //handle file upload
-        if($request->image){
-            $fileNameToStore = $request->input('title').'_'.time().'.png';
-            \Image::make($request->image)->save('storage/doodles/'.$fileNameToStore);
-        }else{
-            $fileNameToStore = 'noimage.jpg';
-        }
-        $created = Doodle::create([
-            'title' => $request->input('title'),
-            'description' => $request->input('description'),
-            'visibility' => $request->input('visibility'),
-            'image' => $fileNameToStore,
-            'user_id' => 1 //get from auth
+        $this->validate($request, [
+            'title'          => 'required',
+            'visibility'     => 'required',
         ]);
-        
-        $details = new AnimationDetail;
-        $details->save();
 
-        return ($created)
-            ? response()->json($created, 201)
-            : response()->json(['message' => 'failed'], 400);
+        return DB::transaction(function() use ($request) {
+
+            $doodle = Doodle::create([
+                'title'       => $request->input('title'),
+                'description' => $request->input('description'),
+                'visibility'  => $request->input('visibility'),
+                'user_id'     => $request->auth->id
+            ]);
+
+            if($doodle){
+
+                $doodle->animationDetail()->create([
+                    'frame_width'  => $request->input('frame_width'),
+                    'frame_height' => $request->input('frame_height'),
+                    'doodle_id'    => $doodle->id
+                ]);
+
+                // generate gif
+                $doodle->image = $doodle->id . '_doodle_' . '.gif';
+                $doodle->save();
+
+            }
+            return response()->json($doodle->id, 201);
+        });
     }
 
-    // Update specific Doodle
-    public function update($id, Request $request)
+    public function update(Request $request)
     {
-        $doodle = Doodle::findOrFail($id);
-        if($request->image){
-            $fileNameToStore = $doodle->image;
-            \Image::make($request->image)->save('storage/doodles/'.$fileNameToStore);
-            return response()->json($updated, 201);
-        }
-        $updated = $doodle->update([
-            'title' => $request->input('title'),
-            'description' => $request->input('description')
+        $this->validate($request, [
+            'title'          => 'required',
+            'visibility'     => 'required',
         ]);
-        return ($updated)
-            ? response()->json($doodle, 201)
-            : response()->json(['message' => 'failed']);
-    }
 
-    // Update image of specific Doodle
-    public function updateImage($id, Request $request)
-    {
-        $doodle = Doodle::findOrFail($id);
-        if($request->image){
-            $fileNameToStore = $doodle->image;
-            \Image::make($request->image)->save('storage/doodles/'.$fileNameToStore);
-            return response()->json(['message' => 'success'], 201);
-        }
-        else return response()->json(['message' => 'image not found']);
+        return DB::transaction(function() use ($request) {
+
+            $doodle = Doodle::findOrFail($request->id);
+
+            // generate gif
+            if($doodle->frames->count() > 0){
+                
+                $frames = $doodle->frames->map(function($frame){
+                    return ('storage/frames/' . $frame->image);
+                })->toArray();
+
+                $durations = $doodle->frames->map(function($frame){
+                    return $frame->duration;
+                })->toArray();
+
+                $gif = new GifCreate();
+                $gif->create($frames, $durations);
+                $gif->save('storage/doodles/' . $doodle->image);
+            }
+
+
+            $doodle->update([
+                'title'       => $request->input('title'),
+                'description' => $request->input('description'),
+                'visibility'  => $request->input('visibility')
+            ]);
+
+            $doodle->animationDetail()->update([
+                'sequence'     => $request->sequence,
+                'frame_width'  => $request->frame_width,
+                'frame_height' => $request->frame_height
+            ]);
+
+            return response()->json(['message' => 'success'], 200);
+        });
     }
 
     // Delete specific Doodle

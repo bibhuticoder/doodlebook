@@ -1,9 +1,6 @@
 export default class Brush{
-    constructor(size, color, maxsize, minsize){
+    constructor(size, color){
         this.size = size;    
-        this.maxsize = maxsize;
-        this.minsize = minsize; 
-        this.type = ""; 
         this.color = color;   
     }
 
@@ -142,6 +139,8 @@ export default class Brush{
 
     setContext(ctx){
         this.context = ctx;
+        this.context.lineJoin = 'round';
+        this.context.lineCap = 'round';
     }
 
     getType(){
@@ -153,6 +152,29 @@ export default class Brush{
     }
 
     clear() {
-        this.context.clearRect(0, 0, this.context.canvas.width, this.context.canvas.height);    
+        this.context.clearRect(0, 0, this.context.canvas.width, this.context.canvas.height);  
+        let color = this.context.fillStyle;
+        this.context.fillStyle = "white";
+        this.context.fillRect(0, 0, this.context.canvas.width, this.context.canvas.height);
+        this.context.fillStyle = color;
     }
+
+    drawImageFromSrc(src){
+        let img = new Image();
+        img.src = `${this.baseUrl}/storage/doodles/${this.imgSrc}`;
+        img['crossOrigin'] = "Anonymous";
+        img.onload = () => {
+            this.context.drawImage(img, 0, 0);
+        }
+    }
+
+    drawImage(image){
+        let img = new Image();
+        img.src = image;
+        img['crossOrigin'] = "Anonymous";
+        img.onload = () => {
+            this.context.drawImage(img, 0, 0);
+        }
+    }
+
 } 

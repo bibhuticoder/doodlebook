@@ -21,7 +21,8 @@ class DoodleCollectionResource extends ResourceCollection
                 'description' => str_limit($doodle->description, 10),
                 'image' => $doodle->image,
                 'likes' => $doodle->likes->count(),
-                'comments' => $doodle->comments->count()
+                'comments' => $doodle->comments->count(),
+                'user' => $doodle->user,
             ];
         }); 
     }

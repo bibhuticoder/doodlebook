@@ -15,9 +15,11 @@ class CreateAnimationDetailsTable extends Migration
     {
         Schema::create('animation_details', function (Blueprint $table) {
             $table->increments('id');
-            $table->boolean('infinite')->nullable();
-            $table->int('interval')->nullable();
+            $table->boolean('infinite')->default(1);
+            $table->integer('interval')->default(100);
             $table->string('sequence')->nullable();
+            $table->integer('frame_width')->default(400);
+            $table->integer('frame_height')->default(400);
             $table->integer('doodle_id')->nullable();
             $table->timestamps();
         });
@@ -30,6 +32,6 @@ class CreateAnimationDetailsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('doodles');
+        Schema::dropIfExists('animation_details');
     }
 }

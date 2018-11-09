@@ -23,6 +23,7 @@
         "vue": "^2.5.7"
     },
     "dependencies": {
+        "@deveodk/vue-toastr": "^1.0.4",
         "css-loader": "^1.0.1",
         "vue-style-loader": "^4.1.2",
         "vuebar": "0.0.20"

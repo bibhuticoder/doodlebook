@@ -1,6 +1,8 @@
 <template>
   <div id="app">
     <navbar></navbar>
+    <br>
+    <br>
     <router-view></router-view>
   </div>
 </template>
@@ -21,17 +23,23 @@ export default {
   },
 
   methods: {
+    getUser(){
+
+    }
   },
 
   created(){
     axios.defaults.headers.common['Authorization'] = "Bearer " + localStorage.getItem('_token');
-    this.$store.dispatch('getUser');
+    if(!this.loggedIn) this.$store.dispatch('getUser');
   },
 
-  computed: {
+computed: {
     baseUrl() {
       return this.$store.getters.baseUrl;
     },
+    loggedIn(){
+      return this.$store.getters.loggedIn;
+    }
   }
 
 }
@@ -40,8 +48,21 @@ export default {
 </script>
 
 <style>
+
+  body{
+    overflow-x: hidden;
+  }
+
   .center{
     text-align: center;
     margin: 0 auto;
   }
+  .text-left{
+    text-align: left;
+  }
+
+  .float-left{
+    float: left;
+  }
+
 </style>

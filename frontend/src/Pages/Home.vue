@@ -3,36 +3,36 @@
     <br>
     <h1 class="center">DoodleBook</h1>
     <p class="lead center">
-      A place to draw and share sketches
+      A place to draw and share doodles
     </p>
     <hr>
     <div class="row" v-if="doodles && doodles.length > 0">
       <div class="col" v-for="(doodle, i) in doodles" :key="i" >
-        <div class="card" style="width: 18rem;">
-          <router-link :to="'/doodle/' + doodle.id">
-            <img class="card-img-top" :src="`${baseUrl}/storage/doodles/${doodle.image}`" alt="Card image cap">
-          </router-link>
-          <div class="card-body">
-            <h5 class="card-title">{{doodle.title}}</h5>
-            <p class="card-text">{{doodle.description}}</p>
-          </div>
-          <div class="card-footer">
-            <small class="text-muted float-left"><i class="fas fa-heart"></i> {{doodle.likes}}</small>
-            <small class="text-muted float-right"><i class="fas fa-comments"></i> {{doodle.comments}}</small>
-          </div>
-        </div>
+        <Doodle 
+          :doodle="doodle"
+          mode="view"
+        />
       </div>   
     </div>
-    <div v-else class="alert alert-danger" role="alert">
-      No Doodles to show
+    <div v-else-if="doodles && doodles.length === 0">
+      <p class="lead">No doodles to show</p>
+    </div>
+    <div v-else class="loading center">
+      <br><br>
+      <i class="fas fa-sync fa-spin spinner"></i>
+      <br><br>
+      Loading doodles...
     </div>
   </div>
 </template>
 
 <script>
 import axios from "axios";
+import Doodle from '@/Components/Doodle';
+
 export default {
   name: "Home",
+  components: {Doodle},
   data() {
     return {
       doodles: null
@@ -66,4 +66,9 @@ export default {
 </script>
 
 <style scoped>
+
+  .spinner{
+    font-size: 50px;
+  }
+
 </style>

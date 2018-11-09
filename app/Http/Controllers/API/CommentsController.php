@@ -9,6 +9,13 @@ use App\Http\Controllers\Controller;
 class CommentsController extends Controller
 {
 
+    // list all comments of the doodle
+    public function index($id)
+    {
+        $comments = Comment::with('user')->where('doodle_id', $id)->orderBy('created_at', 'DESC')->paginate(10);
+        return response()->json($comments, 200);
+    }
+
     // store Comment in Database
     public function store(Request $request)
     {
@@ -16,10 +23,10 @@ class CommentsController extends Controller
         $created = Comment::create([
             'comment' => $request->input('comment'),
             'doodle_id' => $request->input('doodle_id'),
-            'user_id' => 1 //get from auth
+            'user_id' => $request->auth->id
         ]);
         return ($created)
-            ? response()->json($created, 201)
+            ? response()->json($created->load('user'), 201)
             : response()->json(['message' => 'failed'], 400);
     }
 
@@ -34,7 +41,6 @@ class CommentsController extends Controller
             ? response()->json($comment, 201)
             : response()->json(['message' => 'failed']);
     }
-
     
     // Delete specific Doodle
     public function destroy($id)

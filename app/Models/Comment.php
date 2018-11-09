@@ -19,4 +19,8 @@ class Comment extends Model
         return $this->belongsTo('App\Models\Doodle', 'doodle_id');
     }
 
+    public function user(){
+        return $this->belongsTo('App\User', 'user_id');
+    }
+
 }

@@ -13,12 +13,18 @@ class FramesController extends Controller
     public function store(Request $request)
     {
         //handle file upload
+        if($request->image){
+            $fileNameToStore = $request->input('doodle_id').'_'.time().'.png';
+            \Image::make($request->image)->save('storage/frames/'.$fileNameToStore);
+        }else{
+            $fileNameToStore = 'noimage.jpg';
+        }
         $created = Frame::create([
-            'data' => $request->input('data'),
+            'image' => $fileNameToStore,
             'doodle_id' => $request->input('doodle_id'),
         ]);
         return ($created)
-            ? response()->json($created, 201)
+            ? response()->json($created->id, 201)
             : response()->json(['message' => 'failed'], 400);
     }
 
@@ -26,11 +32,19 @@ class FramesController extends Controller
     public function update($id, Request $request)
     {
         $frame = Frame::findOrFail($id);
+        
+        //handle file upload
+        if($request->image){
+            \Image::make($request->image)->save('storage/frames/'. $frame->image);
+        }
+
         $updated = $frame->update([
-            'data' => $request->input('data')
+            'duration' => $request->input('duration'),
+            'image' => $frame->image
         ]);
+
         return ($updated)
-            ? response()->json($frame, 201)
+            ? response()->json(['message' => 'success'], 201)
             : response()->json(['message' => 'failed']);
     }
 
