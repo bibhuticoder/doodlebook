@@ -44,7 +44,7 @@ class FramesController extends Controller
         ]);
 
         return ($updated)
-            ? response()->json(['message' => 'success'], 201)
+            ? response()->json(['message' => 'success'], 200)
             : response()->json(['message' => 'failed']);
     }
 

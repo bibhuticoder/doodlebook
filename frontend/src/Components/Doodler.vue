@@ -39,10 +39,6 @@
             <i class="fas fa-plus"></i>
           </div>
 
-          <div v-if="addingFrame" class="adding-frame" :style="'color: ' + color">
-            <i class="fas fa-sync fa-spin"></i>
-          </div>
-
         </td>
         <td>
           <Canvas
@@ -80,6 +76,7 @@ export default {
 
       currentFrame: 0,
       frames: [],
+      sequence: null,
       addingFrame: false,
       timer: null
     }
@@ -101,12 +98,12 @@ export default {
     });
 
     for(var i=0; i<frames.length; i++){
-      var self = this;
-      this.urlToData(this.frames[i].data, function(data){
-        self.frames[i].data = data;
+      this.urlToData(this.frames[i].data, (data) => {
+        this.frames[i].data = data;
       })
     }
-  
+
+    if(this.frames.length > 0) this.switchFrame(0);
   },
 
   methods: {
@@ -142,16 +139,19 @@ export default {
       if(this.addingFrame) return;
       if(emptyFrame)this.clearBoard();
       let frameData = this.$refs.canvas.getData();
+      this.frames.push({id: null, sn: this.frames.length, data: frameData, status: 1, duration: 100});
+      this.addingFrame = true;
       var self = this;
-      self.addingFrame = true;
       axios.post(`${this.baseUrl}/api/frame`, {
         doodle_id: self.doodleId,
         image: frameData
       })
       .then(response => {
-        self.frames.push({id: response.data, sn: self.frames.length, data: frameData, status: 2, duration: 100});
-        self.currentFrame = self.frames.length-1;
-        self.addingFrame = false;
+        this.frames[this.frames.length-1].id = response.data;
+        this.frames[this.frames.length-1].status = 2;
+        this.switchFrame(this.frames.length-1);
+        this.addingFrame = false;
+        this.updateAnimationDetail();
       })
       .catch(e => {
         console.log(e);
@@ -159,16 +159,14 @@ export default {
     },
 
     updateCurrentFrame(data){
-      var self = this;
-      self.frames[self.currentFrame].status = 1;
-      if(data) self.frames[self.currentFrame].data = data;
-      axios.put(`${this.baseUrl}/api/frame/${self.frames[self.currentFrame].id}`, {
-        image: self.frames[self.currentFrame].data,
-        duration: self.frames[self.currentFrame].duration
+      this.frames[this.currentFrame].status = 1;
+      if(data) this.frames[this.currentFrame].data = data;
+      axios.put(`${this.baseUrl}/api/frame/${this.frames[this.currentFrame].id}`, {
+        image: this.frames[this.currentFrame].data,
+        duration: this.frames[this.currentFrame].duration
       })
       .then(response => {
-        self.frames[self.currentFrame].status = 2;
-        self.$emit('statusChange', 0);
+        this.frames[this.currentFrame].status = 2;
       })
       .catch(e => {
         console.log(e);
@@ -177,10 +175,12 @@ export default {
 
     deleteCurrentFrame(){
       var self = this;
-      self.frames[self.currentFrame].status = 1;
-      axios.delete(`${this.baseUrl}/api/frame/${self.frames[self.currentFrame].id}`)
+      this.frames[this.currentFrame].status = 1;
+      axios.delete(`${this.baseUrl}/api/frame/${this.frames[this.currentFrame].id}`)
       .then(response => {
-        self.frames.splice(self.currentFrame, 2);
+        this.frames.splice(this.currentFrame, 1);
+        this.updateAnimationDetail();
+        this.switchFrame(this.currentFrame-1);
       })
       .catch(e => {
         console.log(e);
@@ -189,6 +189,10 @@ export default {
 
     switchFrame(index){
       this.clearBoard();
+
+      // just clear canvas if frames are empty
+      if(index < 0) return;
+
       let image = this.frames[index].data;
       this.currentFrame = index;
       this.$refs.canvas.drawImage(image);
@@ -223,8 +227,8 @@ export default {
     },
 
     updateAnimationDetail(){
-      this.animation_detail.sequence = this.frames.map(frame => frame.sn).join(',');
-      this.$emit('animationDetailChange', this.animation_detail);
+      this.sequence = this.frames.map(frame => frame.sn).join(',');
+      this.$emit('animationDetailChange', this.sequence);
     },
 
   },

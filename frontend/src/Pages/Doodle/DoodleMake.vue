@@ -111,8 +111,8 @@ export default {
         });
     },
 
-    handleAnimationDetailChange(animation_detail){
-      this.doodle.sequence = animation_detail.sequence;
+    handleAnimationDetailChange(sequence){
+      this.doodle.animation_detail.sequence = sequence;
       this.changeStatus(0);
     },
 

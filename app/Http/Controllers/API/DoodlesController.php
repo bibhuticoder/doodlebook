@@ -89,23 +89,6 @@ class DoodlesController extends Controller
 
             $doodle = Doodle::findOrFail($request->id);
 
-            // generate gif
-            if($doodle->frames->count() > 0){
-                
-                $frames = $doodle->frames->map(function($frame){
-                    return ('storage/frames/' . $frame->image);
-                })->toArray();
-
-                $durations = $doodle->frames->map(function($frame){
-                    return $frame->duration;
-                })->toArray();
-
-                $gif = new GifCreate();
-                $gif->create($frames, $durations);
-                $gif->save('storage/doodles/' . $doodle->image);
-            }
-
-
             $doodle->update([
                 'title'       => $request->input('title'),
                 'description' => $request->input('description'),
@@ -117,6 +100,38 @@ class DoodlesController extends Controller
                 'frame_width'  => $request->frame_width,
                 'frame_height' => $request->frame_height
             ]);
+
+            // generate gif
+            if($doodle->frames->count() > 0){
+                
+                // get all frames and sequences
+                $allFrames = $doodle->frames->map(function($frame){
+                    return ('storage/frames/' . $frame->image);
+                })->toArray();
+                $allDurations = $doodle->frames->map(function($frame){
+                    return $frame->duration;
+                })->toArray();
+                
+                // arrange according to sequence
+                if($doodle->animationDetail->sequence){
+                    $sequence = explode(",", $doodle->animationDetail->sequence);
+                    $frames = array();
+                    $durations = array();
+                    for($i = 0; $i < count($sequence); $i++){
+                        $index = intval($sequence[$i]);
+                        array_push($frames, $allFrames[$index]);
+                        array_push($durations, $allDurations[$index]);
+                    }
+                }else{
+                    $frames = $allFrames;
+                    $durations = $allDurations;
+                }
+
+                // create gif
+                $gif = new GifCreate();
+                $gif->create($frames, $durations);
+                $gif->save('storage/doodles/' . $doodle->image);
+            }
 
             return response()->json(['message' => 'success'], 200);
         });
