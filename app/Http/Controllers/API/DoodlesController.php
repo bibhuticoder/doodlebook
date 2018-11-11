@@ -106,7 +106,7 @@ class DoodlesController extends Controller
                 
                 // get all frames and sequences
                 $allFrames = $doodle->frames->map(function($frame){
-                    return ('storage/frames/' . $frame->image);
+                    return (public_path('storage\frames\\' . $frame->image));
                 })->toArray();
                 $allDurations = $doodle->frames->map(function($frame){
                     return $frame->duration;
