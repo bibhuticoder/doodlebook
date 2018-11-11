@@ -63,10 +63,11 @@ return [
 
         'pgsql' => [
             'driver'   => 'pgsql',
-            'host'     => $host,
-            'database' => $database,
-            'username' => $username,
-            'password' => $password,
+            'host'     => 'ec2-50-19-127-158.compute-1.amazonaws.com',
+            'port'     => 5432,
+            'database' => 'd299kh71uobhj8',
+            'username' => 'azjktgenjqgxqa',
+            'password' => '65f1a833b98d870ce33fc99778883ca6b5d9bbbfafcd1ea19d6c2d7c842058ec',
             'charset'  => 'utf8',
             'prefix'   => '',
             'schema'   => 'public',
