@@ -130,7 +130,7 @@ class DoodlesController extends Controller
                 // create gif
                 $gif = new GifCreate();
                 $gif->create($frames, $durations);
-                $gif->save('storage/doodles/' . $doodle->image);
+                $gif->save(public_path('storage\doodles\\' . $doodle->image));
             }
 
             return response()->json(['message' => 'success'], 200);
