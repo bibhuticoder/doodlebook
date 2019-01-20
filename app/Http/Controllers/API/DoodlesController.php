@@ -106,7 +106,7 @@ class DoodlesController extends Controller
                 
                 // get all frames and sequences
                 $allFrames = $doodle->frames->map(function($frame){
-                    return (public_path('\storage\frames\\' . $frame->image));
+                    return (public_path('/storage/frames/' . $frame->image));
                 })->toArray();
                 $allDurations = $doodle->frames->map(function($frame){
                     return $frame->duration;
@@ -130,7 +130,7 @@ class DoodlesController extends Controller
                 // create gif
                 $gif = new GifCreate();
                 $gif->create($frames, $durations);
-                $gif->save(public_path('\storage\doodles\\' . $doodle->image));
+                $gif->save(public_path('/storage/doodles/' . $doodle->image));
             }
 
             return response()->json(['message' => 'success'], 200);

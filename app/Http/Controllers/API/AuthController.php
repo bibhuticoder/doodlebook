@@ -73,7 +73,7 @@ class AuthController extends BaseController
             'password' => $passwordHash,
             'profile_pic' => $profile_pic_name
         ]);
-        Avatar::create($request->input('username'))->save(public_path('\storage\profile_pics\\' . $profile_pic_name, 100));
+        Avatar::create($request->input('username'))->save(public_path('/storage/profile_pics/' . $profile_pic_name, 100));
         
         return response()->json([
             'token' => $this->jwt($user)
@@ -86,7 +86,7 @@ class AuthController extends BaseController
 
     public function update(Request $request){
         if($request->image){
-            \Image::make($request->image)->save(public_path('\storage\profile_pics\\' . $request->auth->profile_pic));
+            \Image::make($request->image)->save(public_path('/storage/profile_pics/' . $request->auth->profile_pic));
         }
         $updated = $request->auth->update([
             'email' => $request->input('email'),

@@ -86,43 +86,35 @@ export default {
 
   },
 
-  mounted() {
+  async mounted() {
+    this.frames = [];
 
-    this.frames = this.initFrames.map((frame, i) => {
-      return({
-        ...frame,
-        sn: i,
-        data: `${this.baseUrl}/getImage?type=frame&filename=${frame.image}`,
-        status: 2,
-      });
-    });
-
-    for(var i=0; i<frames.length; i++){
-      this.urlToData(this.frames[i].data, (data) => {
-        this.frames[i].data = data;
-      })
-    }
-
-    if(this.frames.length > 0) this.switchFrame(0);
-  },
-
-  methods: {
-
-    urlToData(url, callback){
-      var c = document.createElement('canvas');
-      var ctx = c.getContext('2d');
+    this.initFrames.forEach((frame, i) => {
       let img = new Image;
       img.crossOrigin  = "Anonymous";
+      img.src = `${this.baseUrl}/getImage?type=frame&filename=${frame.image}`;
       img.onload = () => {
+        var c = document.createElement('canvas');
+        var ctx = c.getContext('2d');
         c.height = img.height;
         c.width = img.width;
         ctx.drawImage(img, 0, 0);
-        callback(c.toDataURL("image/png"));
+        var canvasData = c.toDataURL("image/png");
+        this.frames.push({
+          ...frame,
+          sn: i,
+          data: canvasData,
+          status: 2,
+        });
+        this.switchFrame(0);
       };
-      img.src = url;
-    },
+    });
+  },
+
+  methods: {
     
     handleCanvasChange(data) {
+      if(this.frames.length === 0) return;
       this.updateCurrentFrame(data);
     },
 

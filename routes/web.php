@@ -18,7 +18,7 @@ Route::get('/', function () {
 });
 
 Route::get('/getImage', function (Request $request) {
-    $filepath = public_path().'\storage\\' . $request->query('type') . 's\\' . $request->query('filename');
+    $filepath = public_path().'/storage/' . $request->query('type') . 's/' . $request->query('filename');
     $headers = array(
         'Content-Type'                 => array_last(explode($request->query('filename'), '.')),
         "Access-Control-Allow-Origin"  => '*',

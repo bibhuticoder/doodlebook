@@ -5,7 +5,7 @@ Vue.use(Vuex)
 
 export const store = new Vuex.Store({
   state:{
-    baseUrl: 'https://doodlebook.herokuapp.com',
+    baseUrl: 'http://127.0.0.1:8000',
     token: localStorage.getItem('_token') || null,
     user: null
   },

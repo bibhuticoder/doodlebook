@@ -87,7 +87,9 @@ export default {
           } 
         })
         .catch(e => {
-          this.$toastr('error', e.response.data.message, 'Error');
+          if(e.response) this.$toastr('error', e.response.data.message, 'Error');
+          else this.$toastr('error', 'Sorry! There was an error.', 'Error');
+          
           this.loading = false;
         });
     }
