@@ -32,10 +32,11 @@ class DoodlesController extends Controller
     }
 
     // show specific doodle
-    public function show($id)
+    public function show(Request $request, $id)
     {
         $doodle = Doodle::findOrFail($id);
-        return response()->json(($doodle), 200);
+        // $doodle['liked'] = DoodleLike::where('doodle_id', $this->id)->where('user_id', $request->auth->id)->exists();
+        return response()->json(new DoodleResource($doodle), 200);
     }
 
     // show specific doodle with frames
@@ -142,9 +143,9 @@ class DoodlesController extends Controller
             : response()->json(['message' => 'failed'], 400);
     }
 
-    public function like($doodle_id)
+    public function like(Request $request, $doodle_id)
     {
-        $user_id = 1; //from Auth
+        $user_id = $request->auth->id; //from Auth
 
         // check if already liked
         $like = DoodleLike::where('doodle_id', $doodle_id)->where('user_id', $user_id)->count();
@@ -159,9 +160,9 @@ class DoodlesController extends Controller
             : response()->json(['message' => 'failed'], 400);
     }
 
-    public function dislike($doodle_id)
+    public function dislike(Request $request, $doodle_id)
     {
-        $user_id = 1; //from Auth
+        $user_id = $request->auth->id; //from Auth
         $like = DoodleLike::where([
             'doodle_id' => $doodle_id,
             'user_id' => $user_id

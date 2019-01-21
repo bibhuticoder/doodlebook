@@ -18,7 +18,8 @@ class CommentCollectionResource extends ResourceCollection
             return [
                 'id' => $comment->id,
                 'comment' => $comment->comment,
-                'created_at' => $comment->created_at
+                'created_at' => $comment->created_at->toFormattedDateString(),
+                'user' => $comment->user
             ];
         }); 
     }

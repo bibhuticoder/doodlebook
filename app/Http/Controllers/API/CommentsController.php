@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API;
 use Illuminate\Http\Request;
 use App\Models\Comment;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\Comment\CommentCollectionResource;
 
 class CommentsController extends Controller
 {
@@ -13,7 +14,7 @@ class CommentsController extends Controller
     public function index($id)
     {
         $comments = Comment::with('user')->where('doodle_id', $id)->orderBy('created_at', 'DESC')->paginate(10);
-        return response()->json($comments, 200);
+        return response()->json(new CommentCollectionResource($comments), 200);
     }
 
     // store Comment in Database
