@@ -1,37 +1,4 @@
 <template>
-  <!-- <b-card>
-    <b-media>
-      <b-img class="round-image" :src="`${baseUrl}/storage/profile_pics/${comment.user.profile_pic}`" slot="aside" width="64" height="64" />
-      <h5 class="mt-0">{{comment.user.username}}</h5>
-      <p>{{comment.comment}}</p>
-
-      <b-media v-for="(reply, i) in comment.replies" :key="i">
-        <b-img class="round-image" :src="`${baseUrl}/storage/profile_pics/${reply.user.profile_pic}`" slot="aside" width="64" height="64" />
-          <h5 class="mt-0">{{reply.user.username}}</h5>
-          <p class="mb-0">{{reply.reply}}</p>
-      </b-media>
-
-      <div v-if="loggedIn">
-        <button 
-          v-if="!showReplyInput" 
-          class="btn btn-primary btn-sm float-right" 
-          @click="showReplyInput=true">
-            Reply
-        </button>
-
-        <div v-if="showReplyInput">
-          <textarea class="form-control" rows="3" v-model="reply"></textarea>
-          <br>
-          <button class="btn btn-success btn-sm" @click="submitReply"> Reply </button>
-          <button class="btn btn-default btn-sm" @click="showReplyInput=false">
-            <i class="fas fa-chevron-up"></i>
-          </button>
-        </div>
-        
-      </div>
-
-    </b-media>
-  </b-card> -->
   <div class="comment">
     <div class="comment-user-image">
       <img :src="`${baseUrl}/storage/profile_pics/${comment.user.profile_pic}`" alt="">
@@ -44,9 +11,6 @@
     </div>
     <div class="body">
       {{comment.comment}}
-    </div>
-    <div class="footer">
-      <button> Replies <i class="fas fa-chevron-down"></i> </button>
     </div>
   </div>
 </template>

@@ -3,27 +3,41 @@
     <br>
     <div v-if="doodle">
 
-      <h5>{{doodle.title}}</h5>
-      <i class="fas fa-heart"></i> {{doodle.likes}} Likes
-      <br> 
-      <i class="fas fa-calendar-alt"></i> {{doodle.created_at}} 
-      
-      <div v-if="loggedIn">
-        <br>
+      <div class="container">
+        <div class="row">
+          <div class="col-md-3">
+            <h3>{{doodle.title}}</h3>
+            <b-badge variant="light">
+              <i class="fas fa-heart"></i> {{doodle.likes}} Likes
+            </b-badge>
+            <br>
+            <b-badge variant="light">
+               <i class="fas fa-calendar-alt"></i> {{doodle.created_at}} 
+            </b-badge>
+            <br>
+            <b-badge variant="light">
+               <i class="fas fa-user"></i> {{doodle.user.username}} 
+            </b-badge>
+            <div v-if="loggedIn && !doodle.liked">
+              <button class="btn btn-success btn-sm" v-if="!doodle.starred" @click="likeDoodle">
+                <i class="fas fa-heart"></i> Like
+              </button>
+            </div>
+            
+            <hr> 
+            
+            <div class="panel" v-html="doodle.description"></div>
 
-        <button class="btn btn-default btn-sm" v-if="!doodle.starred" @click="likeDoodle">
-          <i class="fas fa-star"></i> Star
-        </button>
-        <button class="btn btn-default btn-sm">
-          <i class="fas fa-anchor"></i> Fork
-        </button>
+            
+
+          </div>
+          <div class="col-md-9">
+            <div>
+              <b-img :src="`${baseUrl}/storage/doodles/${doodle.image}`" thumbnail fluid alt="Responsive image" />
+            </div>
+          </div>
+        </div>
       </div>
-      
-      <br>
-      <img class="doodle-image" :src="`${baseUrl}/storage/doodles/${doodle.image}`">
-      
-      
-      <div v-html="doodle.description"></div>
 
       <div class="comments" v-if="comments && comments.length > 0">
         <br>
@@ -37,6 +51,7 @@
       <div v-else-if="comments && comments.length === 0">
         No comments. Be the first one to comment.
       </div>
+
       <div class="center" v-else>
         <hr>
         <i class="status fas fa-circle-notch fa-spin"></i>
@@ -45,7 +60,6 @@
       </div>
 
       <div v-if="loggedIn">
-        <br>
         <!-- Comment Box -->
         <textarea 
           class="form-control" 
@@ -108,7 +122,7 @@ export default {
       axios
         .get(`${this.baseUrl}/api/doodle/${this.$route.params.id}/comments`)
         .then(response => {
-          this.comments = response.data.data;
+          this.comments = response.data;
         })
         .catch(e => {
           console.log(e);
@@ -127,7 +141,7 @@ export default {
           }
         })
         .catch(e => {
-          console.log(e);
+          this.$toastr('error', 'Already Liked', 'Error');
         });
     },
 
@@ -169,7 +183,8 @@ export default {
 <style scoped>
 
   .doodle-image{
-    height: 200px;
+    margin: 0 auto;
+    height: 500px;
     border-style: solid;
     border-color: grey;
   }
