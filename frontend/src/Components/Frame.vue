@@ -1,5 +1,6 @@
 <template>
-  <div 
+  <div
+    v-if="frame" 
     class="frame" 
     :class="{'frame-selected': selected}"
     @click="$emit('clicked')">

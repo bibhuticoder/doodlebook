@@ -53,10 +53,10 @@
         v-model="selectedColor" 
         @input="handleColorChanged"
         colors="text-advanced" 
-        shapes="circles"
+        shapes="squares"
         swatch-size="20"
         :show-border="true"
-        :trigger-style="{borderStyle: 'solid', borderWidth: '3px', borderColor: 'whitesmoke', height: '35px', width: '35px', cursor: 'pointer', boxShadow: '1px 1px 2px black'}"
+        :trigger-style="{ height: '35px', width: '35px', cursor: 'pointer', boxShadow: '1px 1px 2px black'}"
       />
 
   </div>

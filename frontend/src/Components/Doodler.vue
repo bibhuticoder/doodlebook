@@ -27,7 +27,7 @@
             @end="updateAnimationDetail">
               <!-- Frames -->
               <Frame 
-                v-for="(frame, i) in frames" 
+                v-for="(frame, i) in frames"
                 :key="i"
                 :frame="frame" 
                 :selected="i === currentFrame"
@@ -63,6 +63,7 @@ import DoodlerToolbar from '@/Components/DoodlerToolbar';
 import Frame from '@/Components/Frame';
 import draggable from 'vuedraggable';
 import axios from "axios";
+import helper from '../helper'
 
 export default {
   components: {draggable, Canvas, DoodlerToolbar, Frame},
@@ -86,28 +87,38 @@ export default {
 
   },
 
-  async mounted() {
-    this.frames = [];
+  mounted() {
 
+    /*
+     framesArr: used to Preserve array order
+     doneProcessing: only asign 'frames' after all processing is done
+     IIFE is used to add to specific index of array from inside
+    */
+
+    var framesArr = new Array(this.initFrames.length);
+    var doneProcessing = framesArr.length;
     this.initFrames.forEach((frame, i) => {
-      let img = new Image;
-      img.crossOrigin  = "Anonymous";
-      img.src = `${this.baseUrl}/getImage?type=frame&filename=${frame.image}`;
-      img.onload = () => {
-        var c = document.createElement('canvas');
-        var ctx = c.getContext('2d');
-        c.height = img.height;
-        c.width = img.width;
-        ctx.drawImage(img, 0, 0);
-        var canvasData = c.toDataURL("image/png");
-        this.frames.push({
-          ...frame,
-          sn: i,
-          data: canvasData,
-          status: 2,
-        });
-        this.switchFrame(0);
-      };
+      
+      // use index inside callback
+      ((index) => {
+        helper.urlToCanvasData(`${this.baseUrl}/getImage?type=frame&filename=${frame.image}`, (canvasData) => {
+          framesArr[index] = ({
+            ...frame,
+            sn: index+1,
+            data: canvasData,
+            status: 2,
+          });
+          doneProcessing--;
+          
+          // after all procesing is done
+          if(doneProcessing === 0){
+            this.frames = framesArr;
+            this.switchFrame(0);
+            console.log('assignFrame');
+          }
+          
+        })
+      })(i);
     });
   },
 
@@ -116,6 +127,7 @@ export default {
     handleCanvasChange(data) {
       if(this.frames.length === 0) return;
       this.updateCurrentFrame(data);
+      this.$emit('statusChange', 0);
     },
 
     clearBoard(){
@@ -125,6 +137,7 @@ export default {
     handleDurationChange(duration){
       this.frames[this.currentFrame].duration = duration;
       this.frames[this.currentFrame].status = 0;
+      this.$emit('statusChange', 0);
     },
 
     addFrame(emptyFrame){
@@ -219,7 +232,7 @@ export default {
     },
 
     updateAnimationDetail(){
-      this.sequence = this.frames.map(frame => frame.sn).join(',');
+      this.sequence = this.frames.map(frame => frame.id).join(',');
       this.$emit('animationDetailChange', this.sequence);
     },
 

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API;
 use Illuminate\Http\Request;
 use App\Models\Frame;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Storage;
 
 class FramesController extends Controller
 {
@@ -14,7 +15,7 @@ class FramesController extends Controller
     {
         //handle file upload
         if($request->image){
-            $fileNameToStore = $request->input('doodle_id').'_'.time().'.png';
+            $fileNameToStore = 'frame_' . $request->input('doodle_id').'_'.time().'.png';
             \Image::make($request->image)->save(public_path('/storage/frames/'.$fileNameToStore));
         }else{
             $fileNameToStore = 'noimage.jpg';
@@ -54,6 +55,7 @@ class FramesController extends Controller
     {
         $frame = Frame::findOrFail($id);
         $deleted = $frame->delete();
+        Storage::delete('public/frames/'.$frame->image);
         return ($deleted)
             ? response()->json(['message' => 'success'], 200)
             : response()->json(['message' => 'failed'], 400);

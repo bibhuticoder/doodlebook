@@ -8,6 +8,7 @@ use App\Models\DoodleLike;
 use App\Models\AnimationDetail;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Doodle\DoodleResource;
+use App\Http\Resources\Doodle\DoodleWithFramesResource;
 use App\Http\Resources\Doodle\DoodleCollectionResource;
 use App\Http\Requests\DoodleRequest;
 use Illuminate\Support\Facades\DB;
@@ -41,7 +42,16 @@ class DoodlesController extends Controller
     public function showWithFrames($id)
     {
         $doodle = Doodle::with('frames', 'animationDetail')->findOrFail($id);
-        return response()->json($doodle, 200);
+
+        // sort frames according to sequence
+        $sequence  = explode(",", $doodle->animationDetail->sequence);
+        $frames    = array();
+        for($i = 0; $i < count($sequence); $i++){
+            $frame = $doodle->frames-> firstWhere('id', intval($sequence[$i]));
+            array_push($frames, $frame);
+        }
+        $doodle['frames_sorted'] = $frames;
+        return response()->json(new DoodleWithFramesResource($doodle), 200);
     }
 
     // store Doodle in Database
@@ -103,30 +113,15 @@ class DoodlesController extends Controller
 
             // generate gif
             if($doodle->frames->count() > 0){
-                
-                // get all frames and sequences
-                $allFrames = $doodle->frames->map(function($frame){
-                    return (public_path('/storage/frames/' . $frame->image));
-                })->toArray();
-                $allDurations = $doodle->frames->map(function($frame){
-                    return $frame->duration;
-                })->toArray();
-                
                 // arrange according to sequence
-                if($doodle->animationDetail->sequence){
-                    $sequence = explode(",", $doodle->animationDetail->sequence);
-                    $frames = array();
-                    $durations = array();
-                    for($i = 0; $i < count($sequence); $i++){
-                        $index = intval($sequence[$i]);
-                        array_push($frames, $allFrames[$index]);
-                        array_push($durations, $allDurations[$index]);
-                    }
-                }else{
-                    $frames = $allFrames;
-                    $durations = $allDurations;
+                $sequence  = explode(",", $doodle->animationDetail->sequence);
+                $frames    = array();
+                $durations = array();
+                for($i = 0; $i < count($sequence); $i++){
+                    $frame = $doodle->frames-> firstWhere('id', intval($sequence[$i]));
+                    array_push($frames, (public_path('/storage/frames/' . $frame->image)));
+                    array_push($durations, $frame->duration);
                 }
-
                 // create gif
                 $gif = new GifCreate();
                 $gif->create($frames, $durations);

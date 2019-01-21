@@ -14,7 +14,7 @@
           size="sm" 
           type="text" 
           placeholder="New Doodle Title" 
-          @keyup="handleChange"
+          @keyup.native="handleChange"
           v-model="doodle.title">
         </b-form-input>
       </div>
@@ -28,7 +28,7 @@
       <br>
       <div class="form-input">
         <label for="title">Doodle Description</label>
-        <wysiwyg id="description" v-model="doodle.description" @keyup="handleChange" :disabled="loading" />
+        <wysiwyg id="description" v-model="doodle.description" @keyup.native="handleChange" :disabled="loading" />
       </div>
       <br>
       <div class="form-input">
@@ -40,7 +40,7 @@
               size="sm" 
               type="text" 
               placeholder="Width" 
-              @keyup="handleChange"
+              @keyup.native="handleChange"
               v-model="doodle.animation_detail.frame_width" />
             </div>
             <div class="col">
@@ -49,7 +49,7 @@
                 size="sm" 
                 type="text" 
                 placeholder="Height" 
-                @keyup="handleChange"
+                @keyup.native="handleChange"
                 v-model="doodle.animation_detail.frame_height" />
             </div>
         </div>
@@ -96,6 +96,7 @@ export default {
     },
 
     handleChange(){
+      console.log('changing...');
       this.$emit('statusChange', 0);
     }
 

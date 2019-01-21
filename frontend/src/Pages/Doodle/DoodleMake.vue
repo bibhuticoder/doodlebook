@@ -56,6 +56,7 @@ export default {
   methods: {
 
     handleSave(doodle){
+      console.log('saving...');
 
       // return if not in unsaved mode
       if(this.status !== 0) return;
