@@ -7,4 +7,4 @@ Tech Stack: Php(Laravel), VueJs, HTML5 Canvas, SCSS
 
 ## Demo
 
-- [Watch in youtube](https://www.youtube.com/watch?v=a1TSt5MqVEY&feature=youtu.be).
+[Watch on youtube](https://www.youtube.com/watch?v=a1TSt5MqVEY&feature=youtu.be).
