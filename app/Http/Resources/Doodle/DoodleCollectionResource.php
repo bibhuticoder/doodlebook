@@ -22,6 +22,7 @@ class DoodleCollectionResource extends ResourceCollection
                 'image' => $doodle->image,
                 'likes' => $doodle->likes->count(),
                 'comments' => $doodle->comments->count(),
+                'created_at' => $doodle->created_at->toFormattedDateString(),
                 'user' => $doodle->user,
             ];
         }); 

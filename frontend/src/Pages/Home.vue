@@ -14,7 +14,7 @@
         />
       </div>   
     </div>
-    <div v-else-if="doodles && doodles.length === 0">
+    <div v-else-if="doodles && doodles.length === 0" class="alert alert-warning">
       <p class="lead">No doodles to show</p>
     </div>
     <div v-else class="loading center">

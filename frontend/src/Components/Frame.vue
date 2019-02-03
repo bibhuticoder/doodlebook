@@ -38,15 +38,15 @@ export default {
 
 <style scoped lang="scss">
   .frame{
-  position: relative;
-  width: 70px;
-  height: 50px;
-  margin: 10px;
-  cursor: pointer;
-  border-style: solid;
-  border-color: lighten($color: grey, $amount: 20);
-  border-width: 2px;
-  transition: all 0.2s ease;
+    position: relative;
+    width: 70px;
+    height: 50px;
+    margin: 10px;
+    cursor: pointer;
+    border-style: solid;
+    border-color: lighten($color: grey, $amount: 20);
+    border-width: 3px;
+    transition: all 0.2s ease;
 
   img{
     width: 100%;
@@ -57,10 +57,9 @@ export default {
     position: absolute;
     top: -8px;
     left: -15px;
-    color: #373737;
-    color: black;
+    color: #3f51b5;
     font-size: 12px;
-    font-weight: bold;
+    // font-weight: bold;
   }
 
   i.status{
@@ -74,13 +73,9 @@ export default {
 
 }
 
-.frame:hover{
-  border-width: 3px;
-}
-
-
 .frame-selected{
   color: #3f51b5;
-  border-color: #3f51b5; 
+  border-color: #3f51b5;
 }
+
 </style>

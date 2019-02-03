@@ -2,7 +2,6 @@
   <div class="container">
     <br>
     <div v-if="doodle">
-
       <div class="container">
         <div class="row">
           <div class="col-md-3">
@@ -23,13 +22,8 @@
                 <i class="fas fa-heart"></i> Like
               </button>
             </div>
-            
             <hr> 
-            
             <div class="panel" v-html="doodle.description"></div>
-
-            
-
           </div>
           <div class="col-md-9">
             <div>
@@ -39,17 +33,16 @@
         </div>
       </div>
 
+      <!-- comments -->
       <div class="comments" v-if="comments && comments.length > 0">
-        <br>
-        <i class="fas fa-comments"></i> {{comments.length}} Comments
         <hr>
         <Comment 
           v-for="(comment, i) in comments" 
           :comment="comment"
           :key="i" />
       </div>
-      <div v-else-if="comments && comments.length === 0">
-        No comments. Be the first one to comment.
+      <div v-else-if="comments && comments.length === 0" class="alert alert-warning">
+        No comments. Be the first one to comment. 
       </div>
 
       <div class="center" v-else>
@@ -60,6 +53,7 @@
       </div>
 
       <div v-if="loggedIn">
+        <br>
         <!-- Comment Box -->
         <textarea 
           class="form-control" 
@@ -154,7 +148,7 @@ export default {
         comment: this.comment,
         doodle_id: this.doodle.id
       }).then(response => {
-        self.doodle.comments.push(response.data);
+        self.comments.push(response.data);
         self.submitLoading = false;
       })
       .catch(e => {

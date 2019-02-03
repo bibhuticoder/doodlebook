@@ -15,6 +15,7 @@
         </div>
         {{doodle.user.username}}
       </div>
+      <span class="badge badge-pill badge-primary"></span>
       
       <span class="float-left">
         <i class="far fa-comments"></i> {{doodle.comments}} comments
@@ -48,14 +49,13 @@ export default {
 </script>
 
 <style scoped lang="scss">
-.doodle {
-
-  position: relative;
-  float: left;
-  width: 300px;
-  height: 300px;
-  margin: 20px;
-  box-shadow: -0.5px -0.5px 10px grey;
+ .doodle {
+    position: relative;
+    float: left;
+    width: 300px;
+    height: 300px;
+    margin: 20px;
+    box-shadow: -0.5px -0.5px 10px grey;
 
   .header{
     width: 100%;

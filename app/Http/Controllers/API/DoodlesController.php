@@ -120,13 +120,13 @@ class DoodlesController extends Controller
                 $durations = array();
                 for($i = 0; $i < count($sequence); $i++){
                     $frame = $doodle->frames-> firstWhere('id', intval($sequence[$i]));
-                    array_push($frames, (public_path('/storage/frames/' . $frame->image)));
+                    array_push($frames, (public_path('\storage\frames\\' . $frame->image)));
                     array_push($durations, $frame->duration);
                 }
                 // create gif
                 $gif = new GifCreate();
                 $gif->create($frames, $durations);
-                $gif->save(public_path('/storage/doodles/' . $doodle->image));
+                $gif->save(public_path('\storage\doodles\\' . $doodle->image));
             }
 
             return response()->json(['message' => 'success'], 200);

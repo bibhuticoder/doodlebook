@@ -11,7 +11,7 @@
         />
       </div>   
     </div>
-    <div v-else class="alert alert-danger" role="alert">
+    <div v-else class="alert alert-warning" role="alert">
       No Doodles to show
     </div>
   </div>

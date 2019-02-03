@@ -16,7 +16,7 @@ class FramesController extends Controller
         //handle file upload
         if($request->image){
             $fileNameToStore = 'frame_' . $request->input('doodle_id').'_'.time().'.png';
-            \Image::make($request->image)->save(public_path('/storage/frames/'.$fileNameToStore));
+            \Image::make($request->image)->save(public_path('\storage\frames\\'.$fileNameToStore));
         }else{
             $fileNameToStore = 'noimage.jpg';
         }
@@ -36,7 +36,7 @@ class FramesController extends Controller
         
         //handle file upload
         if($request->image){
-            \Image::make($request->image)->save(public_path('/storage/frames/'. $frame->image));
+            \Image::make($request->image)->save(public_path('\storage\frames\\'. $frame->image));
         }
 
         $updated = $frame->update([
@@ -55,7 +55,7 @@ class FramesController extends Controller
     {
         $frame = Frame::findOrFail($id);
         $deleted = $frame->delete();
-        Storage::delete('public/frames/'.$frame->image);
+        Storage::delete('public\frames\\'.$frame->image);
         return ($deleted)
             ? response()->json(['message' => 'success'], 200)
             : response()->json(['message' => 'failed'], 400);
