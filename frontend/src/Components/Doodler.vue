@@ -1,19 +1,11 @@
 <template>
   <div>
 
-    <DoodlerToolbar
-      :default-duration="(frames[currentFrame]) ? (frames[currentFrame].duration) : 0"
+    <DoodlerMenubar
       @sizeChanged="(size)=> this.size = size"
       @colorChanged="(color)=> this.color = color"
       @brushChanged="(brush)=> this.brush = brush"
       @cleared="clearBoard"
-      @frameAdded="addFrame(true)"
-      @frameCloned="addFrame(false)"
-      @frameDeleted="deleteCurrentFrame"
-      @animationPlayed="playAnimation"
-      @animationStopped="stopAnimation"
-      @durationChanged="handleDurationChange"
-      @saved="updateCurrentFrame"
     />
       
     <table>
@@ -54,19 +46,30 @@
       </tr>
     </table>
 
+    <DoodlerToolbar
+      :default-duration="(frames[currentFrame]) ? (frames[currentFrame].duration) : 0"
+      @frameAdded="addFrame(true)"
+      @frameCloned="addFrame(false)"
+      @frameDeleted="deleteCurrentFrame"
+      @durationChanged="handleDurationChange"
+      @saved="updateCurrentFrame"
+      @previewToggled="handlePreviewToggle"
+    />
+
   </div>
 </template>
 
 <script>
 import Canvas from '@/Components/Canvas';
 import DoodlerToolbar from '@/Components/DoodlerToolbar';
+import DoodlerMenubar from '@/Components/DoodlerMenubar';
 import Frame from '@/Components/Frame';
 import draggable from 'vuedraggable';
 import axios from "axios";
 import helper from '../helper'
 
 export default {
-  components: {draggable, Canvas, DoodlerToolbar, Frame},
+  components: {draggable, Canvas, DoodlerMenubar, DoodlerToolbar, Frame},
   props: ['doodle-id', 'initFrames'],
   name: "Doodler",
   data(){ 
@@ -79,7 +82,7 @@ export default {
       frames: [],
       sequence: null,
       addingFrame: false,
-      timer: null
+      changeFrameKeyEvent: true
     }
   },
 
@@ -88,6 +91,8 @@ export default {
   },
 
   mounted() {
+    
+    if(this.initFrames.length <= 0) return;
 
     /*
      framesArr: used to Preserve array order
@@ -120,6 +125,22 @@ export default {
         })
       })(i);
     });
+
+
+    // change frame on keypress
+    const UP = 38;
+    const DOWN = 40;
+    document.onkeyup = (e) => {
+      if(!this.changeFrameKeyEvent) return;
+      if(e.keyCode === UP && this.currentFrame > 0){
+        this.currentFrame--;
+        this.switchFrame(this.currentFrame);
+      }
+      else if(e.keyCode === DOWN && this.currentFrame < this.frames.length-1){
+        this.currentFrame++;
+        this.switchFrame(this.currentFrame);
+      }
+    }
   },
 
   methods: {
@@ -143,12 +164,13 @@ export default {
     addFrame(emptyFrame){
       if(this.addingFrame) return;
       if(emptyFrame)this.clearBoard();
+
       let frameData = this.$refs.canvas.getData();
-      this.frames.push({id: null, sn: this.frames.length, data: frameData, status: 1, duration: 100});
+      this.frames.push({id: null, sn: this.frames.length, data: frameData, status: 1, duration: 10});
       this.addingFrame = true;
-      var self = this;
+      
       axios.post(`${this.baseUrl}/api/frame`, {
-        doodle_id: self.doodleId,
+        doodle_id: this.doodleId,
         image: frameData
       })
       .then(response => {
@@ -203,36 +225,20 @@ export default {
       this.$refs.canvas.drawImage(image);
     },
 
-    playAnimation(){
-      var self = this;
-      var count = 0;
-      var limit = this.frames.length * 100;
-
-      while(limit !== 0){
-        this.timer = setTimeout(()=>{
-          self.switchFrame(count);
-          count++;
-          count %= self.frames.length;
-        }, self.frames[self.currentFrame].duration * 10);
-        limit--;
-      }
-
-      // this.timer = setInterval(()=>{
-      //   self.switchFrame(count);
-      //   count++;
-      //   count %= self.frames.length;
-      //   if(count >= limit) clearInterval(self.timer);
-      // }, this.animation_detail.interval);
-
+    handlePreviewToggle(){
+      this.$emit('previewToggled');
     },
 
-    stopAnimation(){
-      clearTimeout(this.timer);
-      this.timer = null;
-    },
+    updateAnimationDetail(e){
 
-    updateAnimationDetail(){
-      this.sequence = this.frames.map(frame => frame.id).join(',');
+      // switch to dragged frame on DRAG_END 
+      if(e) this.switchFrame(e.newIndex);
+
+      // generate sequence string
+      let frameIds = this.frames.map(frame => frame.id);
+      this.sequence = frameIds.join(',');
+      if(frameIds.length === 1) this.sequence = this.sequence + ','; //append comma if only one frame
+
       this.$emit('animationDetailChange', this.sequence);
     },
 
@@ -285,7 +291,4 @@ export default {
   text-align: center;
   cursor: pointer;
 }
-
-
-
 </style>

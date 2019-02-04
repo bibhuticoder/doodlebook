@@ -49,7 +49,7 @@ class DoodlesController extends Controller
         $frames    = array();
         for($i = 0; $i < count($sequence); $i++){
             $frame = $doodle->frames-> firstWhere('id', intval($sequence[$i]));
-            array_push($frames, $frame);
+            if($frame !== NULL) array_push($frames, $frame);
         }
         $doodle['frames_sorted'] = $frames;
         return response()->json(new DoodleWithFramesResource($doodle), 200);
@@ -119,9 +119,11 @@ class DoodlesController extends Controller
                 $frames    = array();
                 $durations = array();
                 for($i = 0; $i < count($sequence); $i++){
-                    $frame = $doodle->frames-> firstWhere('id', intval($sequence[$i]));
-                    array_push($frames, (public_path('\storage\frames\\' . $frame->image)));
-                    array_push($durations, $frame->duration);
+                    $frame = $doodle->frames->firstWhere('id', intval($sequence[$i]));
+                    if($frame){
+                        array_push($frames, (public_path('\storage\frames\\' . $frame->image)));
+                        array_push($durations, $frame->duration);
+                    }   
                 }
                 // create gif
                 $gif = new GifCreate();

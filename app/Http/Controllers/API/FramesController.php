@@ -56,6 +56,13 @@ class FramesController extends Controller
         $frame = Frame::findOrFail($id);
         $deleted = $frame->delete();
         Storage::delete('public\frames\\'.$frame->image);
+
+        // update animation sequence
+        $sequences = explode(",", $frame->doodle->animationDetail->sequence);
+        $sequences = array_diff($sequences, array($frame->id));
+        $frame->doodle->animationDetail->sequence = join(",",$sequences);
+        $frame->doodle->animationDetail->save();
+
         return ($deleted)
             ? response()->json(['message' => 'success'], 200)
             : response()->json(['message' => 'failed'], 400);

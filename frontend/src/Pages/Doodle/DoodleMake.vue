@@ -19,10 +19,16 @@
       ref="doodler"
       @animationDetailChange="handleAnimationDetailChange"
       @statusChange="changeStatus"
+      @previewToggled="showPreview = !showPreview"
       :initFrames="doodle.frames"
       :doodle-id="doodle.id" />
 
     <Status v-if="doodle.id" :status="status" @clicked="handleSave" />
+
+    <Preview
+      v-if="showPreview"
+      :doodleSrc="`${this.baseUrl}/storage/doodles/${doodle.image}`"
+     />
 
   </div>
 </template>
@@ -32,10 +38,11 @@ import axios from "axios";
 import Doodler from '@/Components/Doodler';
 import DoodleCreateDialog from '@/Components/DoodleCreateDialog';
 import Status from '@/Components/Status';
+import Preview from '@/Components/Preview';
 
 export default {
   name: "DoodleMake",
-  components: {Doodler, Status, DoodleCreateDialog},
+  components: {Doodler, Status, DoodleCreateDialog, Preview},
   data() {
     return {
       doodle: {
@@ -49,7 +56,8 @@ export default {
         },
       createDialog: true,
       createDialogLoading: false,
-      status: 0
+      status: 0,
+      showPreview: false
     };
   },
 

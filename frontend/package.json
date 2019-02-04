@@ -24,7 +24,6 @@
     "vue-swatches": "^1.0.2",
     "vue-wysiwyg": "^1.7.2",
     "vue2-scrollbar": "0.0.3",
-    "vuebar": "0.0.20",
     "vuedraggable": "^2.16.0",
     "vuex": "^2.4.0"
   },

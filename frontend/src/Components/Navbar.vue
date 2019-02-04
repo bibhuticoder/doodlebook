@@ -13,11 +13,11 @@
       <b-navbar-nav class="ml-auto">
         <b-nav-form>
           <div v-if="loggedIn">
-            <router-link to="/new" class="btn btn-primary btn-sm">
-              <i class="fas fa-plus"></i> Create New Doodle
+            <router-link to="/new" class="btn btn-secondary btn-sm">
+               Create New Doodle
             </router-link>
 
-            <b-dropdown variant="link" size="lg">
+            <b-dropdown variant="link" size="sm">
               <template slot="button-content">
                 <img class="dropdown-avatar" :src="`${baseUrl}/storage/profile_pics/${user.profile_pic}`" alt="">
               </template>
@@ -83,6 +83,6 @@ export default {
 .dropdown-avatar{
   height: 30px;
   width: 30px;
-  border-radius: 100%;
+  border-radius: 5px;
 }
 </style>

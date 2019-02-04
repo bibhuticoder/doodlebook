@@ -17,6 +17,7 @@ class DoodleWithFramesResource extends JsonResource
         return [
             'id' => $this->id,
             'title' => $this->title,
+            'image' => $this->image,
             'description' => $this->description,
             'frames' => $this->frames_sorted,
             'animation_detail' => $this->animationDetail,

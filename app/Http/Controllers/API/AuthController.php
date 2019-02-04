@@ -66,14 +66,13 @@ class AuthController extends BaseController
         $passwordHash = Hash::make($this->request->input('password'));
         
         //create avatar
-        $profile_pic_name = $request->input('username').'_'.time().'.png';
+        $profile_pic_name = 'new_user.jpg';
         $user = User::create([
             'username' => $this->request->input('username'),
             'email' => $this->request->input('email'),
             'password' => $passwordHash,
             'profile_pic' => $profile_pic_name
         ]);
-        // Avatar::create($request->input('username'))->save(public_path('/storage/profile_pics/' . $profile_pic_name, 100));
         
         return response()->json([
             'token' => $this->jwt($user)
@@ -85,13 +84,16 @@ class AuthController extends BaseController
     }
 
     public function update(Request $request){
+        $profile_pic_name = $request->auth->profile_pic;
         if($request->image){
-            \Image::make($request->image)->save(public_path('/storage/profile_pics/' . $request->auth->profile_pic));
+            $profile_pic_name = $request->auth->username . $request->auth->id .'_'.time().'.png';;
+            \Image::make($request->image)->save(public_path('/storage/profile_pics/' . $profile_pic_name));
         }
         $updated = $request->auth->update([
             'email' => $request->input('email'),
             'username' => $request->input('username'),
             'bio' => $request->input('bio'),
+            'profile_pic' => $profile_pic_name
         ]);
         return response()->json(['user' => $request->auth]);
     }

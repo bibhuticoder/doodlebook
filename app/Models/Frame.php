@@ -11,4 +11,8 @@ class Frame extends Model
         'image', 'doodle_id', 'duration'
     ];
 
+    public function doodle(){
+        return $this->belongsTo('App\Models\Doodle', 'doodle_id');
+    }
+
 }
