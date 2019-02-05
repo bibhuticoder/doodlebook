@@ -32,6 +32,7 @@
           </div>
         </div>
       </div>
+      <br>
 
       <!-- comments -->
       <div class="comments" v-if="comments && comments.length > 0">
